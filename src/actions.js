@@ -1,11 +1,9 @@
 
-import fetch from 'cross-fetch'
+import api from 'bees'
 
 /**
  * Define the action types
  */
-export const REQUEST_PROVIDER = 'REQUEST_PROVIDER'
-export const RECEIVE_PROVIDER = 'RECEIVE_PROVIDER'
 export const REQUEST_PROVIDERS = 'REQUEST_PROVIDERS'
 export const RECEIVE_PROVIDERS = 'RECEIVE_PROVIDERS'
 export const SELECT_PROVIDER = 'SELECT_PROVIDER'
@@ -32,27 +30,18 @@ export function selectProvider(provider) {
 }
 
 /**
- * Requesting a single provider
- * (Is this needed? If the providers are stored at initialization of the upload
- * form...)
+ * Request the providers from the Rails API
+ * Determines from the state whether or not the provider resources should be
+ * requested from the API
  */
-export function requestProvider(provider) {
-  return {
-    type: REQUEST_PROVIDER,
-    provider
-  }
-}
-
-/**
- * Receiving a single provider
- * (Is this needed? If the providers are stored at initialization of the upload
- * form...)
- */
-export function receiveProvider(provider, json) {
-  return {
-    type: RECEIVE_PROVIDER,
-    provider: json.data, // This needs to be transformed from the JSON-API response
-    receivedAt: Date.now()
+function shouldRequestProviders(state) {
+  const providers = state.providers
+  if (!providers) {
+    return true
+  } else if (providers.isRequesting) {
+    return false
+  } else {
+    return providers.didInvalidate
   }
 }
 
@@ -77,3 +66,22 @@ export function receiveProviders(json) {
   }
 }
 
+/**
+ * Request and update the providers in the state
+ */
+function updateProviders() {
+
+  return dispatch => {
+    dispatch(requestProviders())
+    return api.getProviders()
+      .then(json => dispatch(receiveProviders(json)))
+  }
+}
+
+export function updateProvidersIfNeeded() {
+  return (dispatch, getState) => {
+    if (shouldRequestProviders(getState())) {
+      return dispatch(updateProviders())
+    }
+  }
+}
