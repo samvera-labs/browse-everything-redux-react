@@ -1,22 +1,5 @@
-
-import api from 'bees'
-
-/**
- * Define the action types
- */
-export const REQUEST_PROVIDERS = 'REQUEST_PROVIDERS'
-export const RECEIVE_PROVIDERS = 'RECEIVE_PROVIDERS'
-export const SELECT_PROVIDER = 'SELECT_PROVIDER'
-
-export const REQUEST_SESSION = 'REQUEST_SESSION';
-export const RECEIVE_SESSION = 'RECEIVE_SESSION';
-
-export const RECEIVE_AUTH = 'RECEIVE_AUTH';
-
-export const REQUEST_CONTAINER = 'REQUEST_CONTAINER';
-export const RECEIVE_CONTAINER = 'RECEIVE_CONTAINER';
-
-export const SUBMIT_UPLOAD = 'SUBMIT_UPLOAD';
+import { api } from './bees'
+import * as types from './types'
 
 /**
  * Define the actions for updating the Redux state
@@ -24,7 +7,7 @@ export const SUBMIT_UPLOAD = 'SUBMIT_UPLOAD';
 
 export function selectProvider(provider) {
   return {
-    type: SELECT_PROVIDER,
+    type: types.SELECT_PROVIDER,
     provider
   }
 }
@@ -36,13 +19,7 @@ export function selectProvider(provider) {
  */
 function shouldRequestProviders(state) {
   const providers = state.providers
-  if (!providers) {
-    return true
-  } else if (providers.isRequesting) {
-    return false
-  } else {
-    return providers.didInvalidate
-  }
+  return !providers.isRequesting
 }
 
 /**
@@ -50,18 +27,22 @@ function shouldRequestProviders(state) {
  */
 export function requestProviders() {
   return {
-    type: REQUEST_PROVIDERS,
-    providers: []
+    type: types.REQUEST_PROVIDERS,
+    providers: [],
+    isRequesting: true
   }
 }
 
 /**
  * Receiving all of the providers from the API
  */
-export function receiveProviders(json) {
+export function receiveProviders(response) {
+  const body = response.body
+  const data = body.data
   return {
-    type: RECEIVE_PROVIDERS,
-    providers: json.data.children.map(child => child.data), // This needs to be transformed from the JSON-API response
+    type: types.RECEIVE_PROVIDERS,
+    isRequesting: false,
+    providers: data,
     receivedAt: Date.now()
   }
 }
@@ -69,19 +50,20 @@ export function receiveProviders(json) {
 /**
  * Request and update the providers in the state
  */
-function updateProviders() {
+function requestAndReceiveProviders() {
 
   return dispatch => {
     dispatch(requestProviders())
     return api.getProviders()
-      .then(json => dispatch(receiveProviders(json)))
+      .then(response => dispatch(receiveProviders(response)))
   }
 }
 
-export function updateProvidersIfNeeded() {
+      //.catch(response => dispatch(receiveProviders({})))
+export function updateProviders() {
   return (dispatch, getState) => {
     if (shouldRequestProviders(getState())) {
-      return dispatch(updateProviders())
+      return dispatch(requestAndReceiveProviders())
     }
   }
 }
