@@ -1,6 +1,5 @@
-
-import { combineReducers } from 'redux'
-import * as types from './types'
+import { combineReducers } from 'redux';
+import * as types from './types';
 
 /**
  * Define the reducers for the Redux store
@@ -10,13 +9,12 @@ import * as types from './types'
  * Reducer for selecting a provider
  */
 function selectProvider(state = {}, action) {
-
   // Update the state when a provider is selected by the user
   switch (action.type) {
     case types.SELECT_PROVIDER:
-      return action.provider
+      return action.provider;
     default:
-      return state
+      return state;
   }
 }
 
@@ -37,16 +35,16 @@ function updatedProviderState(
       return Object.assign({}, state, {
         isFetching: true,
         didInvalidate: false
-      })
+      });
     case types.RECEIVE_PROVIDERS:
       return Object.assign({}, state, {
         isFetching: false,
         didInvalidate: false,
         items: action.providers,
         lastUpdated: action.receivedAt
-      })
+      });
     default:
-      return state
+      return state;
   }
 }
 
@@ -54,22 +52,22 @@ function updatedProviderState(
  * Reducer for requesting and receiving providers
  */
 function updateProviders(state = {}, action) {
+  const updated = updatedProviderState(state.providers, action);
+
   switch (action.type) {
     case types.REQUEST_PROVIDER:
     case types.RECEIVE_PROVIDER:
-      const updated = updatedProviderState(state.providers, action)
-        //[action.provider]: provider(state[action.provider], action)
       return Object.assign({}, state, {
         providers: updated
-      })
+      });
     default:
-      return state
+      return state;
   }
 }
 
 const rootReducer = combineReducers({
   selectProvider,
   updateProviders
-})
+});
 
-export default rootReducer
+export default rootReducer;
