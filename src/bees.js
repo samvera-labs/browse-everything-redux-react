@@ -1,8 +1,8 @@
-import { buildApi, get, post, patch, destroy } from 'redux-bees';
+import { buildApi, get } from 'redux-bees';
 
 const apiEndpoints = {
-    getProviders:      { method: get,     path: '/providers' },
-    getProvider:       { method: get,     path: '/providers/:id' }
+  getProviders: { method: get, path: '/providers' },
+  getProvider: { method: get, path: '/providers/:id' }
 };
 
 const config = {
