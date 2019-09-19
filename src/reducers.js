@@ -1,23 +1,6 @@
 
 import { combineReducers } from 'redux'
-
-import {
-    REQUEST_PROVIDER,
-    RECEIVE_PROVIDER,
-    REQUEST_PROVIDERS,
-    RECEIVE_PROVIDERS,
-    SELECT_PROVIDER,
-
-    REQUEST_SESSION,
-    RECEIVE_SESSION,
-
-    RECEIVE_AUTH,
-
-    REQUEST_CONTAINER,
-    RECEIVE_CONTAINER,
-
-    SUBMIT_UPLOAD
-} from './actions'
+import * as types from './types'
 
 /**
  * Define the reducers for the Redux store
@@ -26,11 +9,11 @@ import {
 /**
  * Reducer for selecting a provider
  */
-function selectProvider(state = 'reactjs', action) {
+function selectProvider(state = {}, action) {
 
   // Update the state when a provider is selected by the user
   switch (action.type) {
-    case SELECT_PROVIDER:
+    case types.SELECT_PROVIDER:
       return action.provider
     default:
       return state
@@ -50,12 +33,12 @@ function updatedProviderState(
   action
 ) {
   switch (action.type) {
-    case REQUEST_PROVIDERS:
+    case types.REQUEST_PROVIDERS:
       return Object.assign({}, state, {
         isFetching: true,
         didInvalidate: false
       })
-    case RECEIVE_PROVIDERS:
+    case types.RECEIVE_PROVIDERS:
       return Object.assign({}, state, {
         isFetching: false,
         didInvalidate: false,
@@ -72,8 +55,8 @@ function updatedProviderState(
  */
 function updateProviders(state = {}, action) {
   switch (action.type) {
-    case REQUEST_PROVIDER:
-    case RECEIVE_PROVIDER:
+    case types.REQUEST_PROVIDER:
+    case types.RECEIVE_PROVIDER:
       const updated = updatedProviderState(state.providers, action)
         //[action.provider]: provider(state[action.provider], action)
       return Object.assign({}, state, {
