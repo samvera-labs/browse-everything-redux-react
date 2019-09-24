@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@material-ui/core": "^4.4.2",
+    "@material-ui/icons": "^4.4.3",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
     "react-scripts": "3.1.1",
@@ -57,6 +59,7 @@
     "fetch-mock": "^7.3.9",
     "node-fetch": "^2.6.0",
     "prettier": "^1.18.2",
+    "redux-logger": "^3.0.6",
     "redux-mock-store": "^1.5.3",
     "timekeeper": "^2.2.0"
   }
