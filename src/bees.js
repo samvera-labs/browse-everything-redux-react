@@ -1,8 +1,11 @@
-import { buildApi, get } from 'redux-bees';
+import { buildApi, get, post } from 'redux-bees';
 
 const apiEndpoints = {
   getProviders: { method: get, path: '/providers' },
-  getProvider: { method: get, path: '/providers/:id' }
+  getProvider: { method: get, path: '/providers/:id' },
+  createSession: { method: post, path: '/sessions' },
+  getRootContainer: { method: get, path: '/sessions/:id/containers' },
+  getContainer: { method: get, path: '/sessions/:id/containers/:id' }
 };
 
 const config = {
