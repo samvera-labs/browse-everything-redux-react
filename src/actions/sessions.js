@@ -12,16 +12,27 @@ function requestSession() {
   };
 }
 
+function buildSession(data) {
+  const session = {};
+
+  session.authorizations = data.relationships.authorizations;
+  session.provider = data.relationships.provider;
+  session.id = data.id
+
+  return session;
+}
+
 /**
  * Receiving all of the providers from the API
  */
 function receiveSession(response) {
   const body = response.body;
   const data = body.data;
+  const session = buildSession(data);
   return {
     type: types.RECEIVE_SESSION,
     isRequesting: false,
-    session: data,
+    session: session,
     receivedAt: Date.now()
   };
 }
@@ -47,7 +58,6 @@ function postAndReceiveSession(provider, authToken) {
     }
 
     return api.createSession(postData).then(response => {
-      console.log(response);
       return dispatch(receiveSession(response));
     });
   };
