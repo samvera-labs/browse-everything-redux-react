@@ -11,7 +11,7 @@ import { getRootContainer, updateRootContainer } from './actions';
  */
 function selectedProvider(currentState = {}, action) {
   const initialState = {
-    selectedProvider: ""
+    selectedProvider: {}
   }
   const state = Object.assign({}, initialState, currentState);
   // Update the state when a provider is selected by the user
@@ -27,7 +27,9 @@ function selectedProvider(currentState = {}, action) {
  * Function for updating the state in response to requesting or receiving a
  * provider
  */
-function updatedProviderState(state = {}, action) {
+function updatedProvidersState(state = {}, action) {
+  console.log('TRACE6');
+  console.log(action);
   switch (action.type) {
     case types.REQUEST_PROVIDERS:
       return Object.assign({}, state, {
@@ -55,7 +57,7 @@ function providers(currentState = {}, action) {
     items: []
   }
   const state = Object.assign({}, initialState, currentState);
-  const updated = updatedProviderState(state.providers, action);
+  const updated = updatedProvidersState(state.providers, action);
 
   switch (action.type) {
     case types.REQUEST_PROVIDERS:
@@ -115,10 +117,24 @@ function rootContainer(currentState = {}, action) {
   }
 }
 
+function authToken(state = {}, action) {
+  switch (action.type) {
+    case types.RECEIVE_WEB_TOKEN:
+      const updated = {
+        authToken: action.authToken,
+        lastUpdated: action.receivedAt
+      }
+      return Object.assign({}, state, updated);
+    default:
+      return state;
+  }
+}
+
 const rootReducer = combineReducers({
   selectedProvider,
   providers,
-  rootContainer
+  rootContainer,
+  currentAuthToken: authToken
 });
 
 export default rootReducer;

@@ -6,18 +6,14 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 
 class SelectProvider extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      provider: this.props.provider
-    };
-  }
-
   render() {
+    const selectedProvider = this.props.selectedProvider;
+    const selectedValue = selectedProvider ? selectedProvider.id : "";
+
     return (
       <FormControl variant="outlined" style={this.props.style.formControl}>
         <Select
-          value={this.props.provider}
+          value={selectedValue}
           onChange={this.props.handleChange}
           inputProps={
             {
@@ -26,8 +22,11 @@ class SelectProvider extends React.Component {
             }
           }
         >
-          <MenuItem value="file_system">File System</MenuItem>
-          <MenuItem value="google_drive">Google Drive</MenuItem>
+          {
+            this.props.providers.items.map((provider) => {
+              return <MenuItem key={provider.id} value={provider.id}>{provider.name}</MenuItem>
+            })
+          }
         </Select>
       </FormControl>
     );
@@ -36,7 +35,8 @@ class SelectProvider extends React.Component {
 
 SelectProvider.propTypes = {
   style: PropTypes.object,
-  provider: PropTypes.string,
+  selectedProvider: PropTypes.object.isRequired,
+  providers: PropTypes.object.isRequired,
   handleChange: PropTypes.func.isRequired
 };
 
