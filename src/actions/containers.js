@@ -64,15 +64,35 @@ function requestRootContainer() {
   };
 }
 
+function buildBytestream(data) {
+  const bytestream = {};
+  bytestream.id = data.id;
+  bytestream.name = data.attributes.name;
+  bytestream.media_type = data.attributes.media_type;
+  bytestream.size = data.attributes.size;
+
+  return bytestream;
+}
+
+function buildContainer(data) {
+  const container = {};
+
+  container.id = data.id;
+  container.name = data.attributes.name;
+  container.bytestreams = data.relationships.bytestreams.data.map(childData => buildBytestream(childData));
+  container.containers = data.relationships.containers.data.map(childData => buildContainer(childData));
+
+  return container;
+}
+
 function receiveRootContainer(response) {
   const body = response.body;
   const data = body.data;
-  console.log('RECEIVED THE CONTAINER');
-  console.log(data);
+  const container = buildContainer(data);
   return {
     type: types.RECEIVE_ROOT_CONTAINER,
     isRequesting: false,
-    item: data,
+    item: container,
     receivedAt: Date.now()
   };
 }
@@ -90,7 +110,9 @@ function requestAndReceiveRootContainer(session, authToken) {
 function shouldRequestRootContainer(state) {
   const rootContainer = state.rootContainer;
 
-  return !rootContainer || !rootContainer.isRequesting;
+  // This requires a refactor
+  const rootContainerEmpty = Object.keys(rootContainer.item).length === 0;
+  return rootContainerEmpty && !rootContainer.isRequesting;
 }
 
 export function getRootContainer(session, authToken) {

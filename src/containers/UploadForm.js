@@ -13,7 +13,8 @@ import Paper from '@material-ui/core/Paper';
 class UploadForm extends React.Component {
   // This should be refactored
   state = {
-    providerSupportsAuth: false
+    providerSupportsAuth: false,
+    rootContainerEmpty: true
   }
 
   constructor(props) {
@@ -53,15 +54,27 @@ class UploadForm extends React.Component {
     // container
 
     // Request the root container if the Session is already established
-    if (Object.keys(this.props.currentSession.item).length > 0) {
+    // This requires a refactor
+    const currentSessionEmpty = Object.keys(this.props.currentSession.item).length === 0;
+    const rootContainerEmpty = Object.keys(this.props.rootContainer.item).length === 0;
+    if (this.state.rootContainerEmpty !== rootContainerEmpty) {
+      this.setState({rootContainerEmpty: rootContainerEmpty});
+    }
+
+    // If the session is established and there is no root container, request it
+    // and build the file tree
+    if (!currentSessionEmpty && rootContainerEmpty) {
       if (!this.props.rootContainer.isRequesting) {
         this.props.dispatch(getRootContainer(this.props.currentSession.item, this.props.currentAuthToken.authToken));
       }
-    } else if (this.props.selectedProvider.id) {
+    } else if (currentSessionEmpty && this.props.selectedProvider.id) {
+      // If there is no session and a provider has been selected, create a
+      // session
       const requestedProvider = this.props.providers.items.find(provider => provider.id === this.props.selectedProvider.id);
       if (!requestedProvider) {
         throw new Error(`Unsupported provider selected: ${this.props.selectedProvider.id}`)
       }
+
       // This is a point for a refactor
       const providerSupportsAuth = !!requestedProvider.authorizationUrl;
       if (providerSupportsAuth !== this.state.providerSupportsAuth) {
@@ -97,8 +110,8 @@ class UploadForm extends React.Component {
               <Paper>
                 <ResourceTree style={this.props.style.resourceTree} root={true} label="Current Files">
 
-                  <ResourceTree style={this.props.style} label="Test Directory" />
-                  <ResourceNode style={this.props.style} label="Test File" />
+                  {!this.state.rootContainerEmpty && this.props.rootContainer.item.containers.map(container => <ResourceTree key={container.id} style={this.props.style} label={container.name} />) }
+                  {!this.state.rootContainerEmpty && this.props.rootContainer.item.bytestreams.map(bytestream => <ResourceNode key={bytestream.id} style={this.props.style} label={bytestream.name} />) }
                 </ResourceTree>
               </Paper>
             </Grid>

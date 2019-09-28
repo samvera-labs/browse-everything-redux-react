@@ -1,8 +1,7 @@
 import * as types from '../types';
-import { getRootContainer, updateRootContainer } from '../actions';
 
 function updatedRootContainerState(state = {}, action) {
-  let updatedRootContainer;
+  //let updatedRootContainer;
 
   switch (action.type) {
     case types.REQUEST_ROOT_CONTAINER:
@@ -11,10 +10,10 @@ function updatedRootContainerState(state = {}, action) {
       });
     case types.RECEIVE_ROOT_CONTAINER:
       // This needs to be removed and a new Action added
-      updatedRootContainer = getRootContainer(action.rootContainer);
+      //updatedRootContainer = getRootContainer(action.rootContainer);
       return Object.assign({}, state, {
         isRequesting: false,
-        rootContainer: updatedRootContainer,
+        item: action.item,
         lastUpdated: action.receivedAt
       });
     case types.REQUEST_CONTAINER:
@@ -23,10 +22,10 @@ function updatedRootContainerState(state = {}, action) {
       });
     case types.RECEIVE_CONTAINER:
       // This needs to be removed and a new Action added
-      updatedRootContainer = updateRootContainer(action.container);
+      //updatedRootContainer = updateRootContainer(action.container);
       return Object.assign({}, state, {
         isRequesting: false,
-        rootContainer: updatedRootContainer,
+        item: action.item,
         lastUpdated: action.receivedAt
       });
     default:
@@ -36,12 +35,12 @@ function updatedRootContainerState(state = {}, action) {
 
 export function rootContainer(currentState = {}, action) {
   const initialState = {
-    rootContainer: {},
+    item: {},
     isRequesting: false
   }
 
   const state = Object.assign({}, initialState, currentState);
-  const updated = updatedRootContainerState(state.providers, action);
+  const updated = updatedRootContainerState(state, action);
 
   switch (action.type) {
     case types.REQUEST_ROOT_CONTAINER:
