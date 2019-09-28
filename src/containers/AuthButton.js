@@ -6,7 +6,7 @@ class AuthButton extends React.Component {
   render() {
     const textContent = this.props.disabled ? 'Authorized' : 'Sign In';
     return (
-      <Button variant="contained" color="secondary" style={this.props.style} onClick={this.props.handleClick} href={this.props.authorizationURL} disabled={this.props.disabled}>{textContent}</Button>
+      <Button variant="contained" color="secondary" style={this.props.style} onClick={this.props.handleClick} href={this.props.authorizationUrl} disabled={this.props.disabled}>{textContent}</Button>
     );
   }
 }
@@ -14,7 +14,7 @@ class AuthButton extends React.Component {
 AuthButton.propTypes = {
   style: PropTypes.object,
   handleClick: PropTypes.func.isRequired,
-  authorizationURL: PropTypes.string.isRequired,
+  authorizationUrl: PropTypes.string.isRequired,
   disabled: PropTypes.bool
 };
 
