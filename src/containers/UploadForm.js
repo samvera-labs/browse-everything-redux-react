@@ -54,7 +54,9 @@ class UploadForm extends React.Component {
 
     // Request the root container if the Session is already established
     if (Object.keys(this.props.currentSession.item).length > 0) {
-      this.props.dispatch(getRootContainer(this.props.currentSession.item));
+      if (!this.props.rootContainer.isRequesting) {
+        this.props.dispatch(getRootContainer(this.props.currentSession.item, this.props.currentAuthToken.authToken));
+      }
     } else if (this.props.selectedProvider.id) {
       const requestedProvider = this.props.providers.items.find(provider => provider.id === this.props.selectedProvider.id);
       if (!requestedProvider) {
@@ -116,10 +118,13 @@ class UploadForm extends React.Component {
 
 UploadForm.propTypes = {
   style: PropTypes.object,
+
   selectedProvider: PropTypes.object.isRequired,
   providers: PropTypes.object.isRequired,
   currentAuthToken: PropTypes.object.isRequired,
   currentSession: PropTypes.object.isRequired,
+  rootContainer: PropTypes.object.isRequired,
+
   dispatch: PropTypes.func.isRequired
 };
 
