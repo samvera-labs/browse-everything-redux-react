@@ -1,72 +1,9 @@
 import { combineReducers } from 'redux';
 import * as types from './types';
 import { getRootContainer, updateRootContainer } from './actions';
-
-/**
- * Define the reducers for the Redux store
- */
-
-/**
- * Reducer for selecting a provider
- */
-function selectedProvider(currentState = {}, action) {
-  const initialState = {
-    selectedProvider: {}
-  }
-  const state = Object.assign({}, initialState, currentState);
-  // Update the state when a provider is selected by the user
-  switch (action.type) {
-    case types.SELECT_PROVIDER:
-      return action.provider;
-    default:
-      return state.selectedProvider;
-  }
-}
-
-/**
- * Function for updating the state in response to requesting or receiving a
- * provider
- */
-function updatedProvidersState(state = {}, action) {
-  console.log('TRACE6');
-  console.log(action);
-  switch (action.type) {
-    case types.REQUEST_PROVIDERS:
-      return Object.assign({}, state, {
-        isRequesting: true,
-        didInvalidate: false
-      });
-    case types.RECEIVE_PROVIDERS:
-      return Object.assign({}, state, {
-        isRequesting: false,
-        didInvalidate: false,
-        items: action.providers,
-        lastUpdated: action.receivedAt
-      });
-    default:
-      return state;
-  }
-}
-
-/**
- * Reducer for requesting and receiving providers
- */
-function providers(currentState = {}, action) {
-  const initialState = {
-    isRequesting: false,
-    items: []
-  }
-  const state = Object.assign({}, initialState, currentState);
-  const updated = updatedProvidersState(state.providers, action);
-
-  switch (action.type) {
-    case types.REQUEST_PROVIDERS:
-    case types.RECEIVE_PROVIDERS:
-      return Object.assign({}, state, updated);
-    default:
-      return state;
-  }
-}
+import { selectedProvider, providers } from './reducers/providers';
+import { authToken } from './reducers/authorization';
+import { session } from './reducers/sessions';
 
 function updatedRootContainerState(state = {}, action) {
   let updatedRootContainer;
@@ -117,22 +54,10 @@ function rootContainer(currentState = {}, action) {
   }
 }
 
-function authToken(state = {}, action) {
-  switch (action.type) {
-    case types.RECEIVE_WEB_TOKEN:
-      const updated = {
-        authToken: action.authToken,
-        lastUpdated: action.receivedAt
-      }
-      return Object.assign({}, state, updated);
-    default:
-      return state;
-  }
-}
-
 const rootReducer = combineReducers({
   selectedProvider,
   providers,
+  currentSession: session,
   rootContainer,
   currentAuthToken: authToken
 });

@@ -16,7 +16,14 @@ class App extends React.Component {
           </Typography>
         </Container>
         <Container maxWidth="lg">
-          <UploadForm styles={this.props.style} dispatch={this.props.dispatch} selectedProvider={this.props.selectedProvider} currentAuthToken={this.props.currentAuthToken} providers={this.props.providers}/>
+          <UploadForm
+            styles={this.props.style}
+            dispatch={this.props.dispatch}
+            selectedProvider={this.props.selectedProvider}
+            currentAuthToken={this.props.currentAuthToken}
+            providers={this.props.providers}
+            currentSession={this.props.currentSession}
+          />
         </Container>
       </div>
     );
@@ -29,19 +36,18 @@ App.propTypes = {
   selectedProvider: PropTypes.object.isRequired, // This should be updated to currentProvider
   providers: PropTypes.object.isRequired,
   currentAuthToken: PropTypes.object.isRequired,
+  currentSession: PropTypes.object.isRequired,
 
   dispatch: PropTypes.func.isRequired
 };
 
 function mapStateToProps(state) {
   const { selectedProvider, currentAuthToken } = state
-  //const providers = {
-  /*
-   items: [
-      { id: 'google_drive', name: 'Google Drive' }
-    ]
-   */
   const providers = state.providers || {
+    isRequesting: false,
+    items: []
+  }
+  const currentSession = state.currentSession || {
     isRequesting: false,
     items: []
   }
@@ -49,7 +55,8 @@ function mapStateToProps(state) {
   return {
     selectedProvider,
     providers,
-    currentAuthToken
+    currentAuthToken,
+    currentSession
   }
 }
 

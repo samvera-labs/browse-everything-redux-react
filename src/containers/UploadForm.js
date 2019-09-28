@@ -32,7 +32,7 @@ class UploadForm extends React.Component {
   handleClickAuthButton(event) {
     // This opens the new window for the OAuth
     event.preventDefault();
-    window.open(this.authorizationURL);
+    window.open(this.props.selectedProvider.authorizationUrl);
   }
 
   handleAuthorize(event) {
@@ -51,8 +51,10 @@ class UploadForm extends React.Component {
   componentDidUpdate(prevProps) {
     // If a Session has been established, retrieve all entries from the root
     // container
-    if (this.props.currentSession) {
-      this.props.dispatch(getRootContainer(this.props.currentSession));
+
+    // Request the root container if the Session is already established
+    if (Object.keys(this.props.currentSession.item).length > 0) {
+      this.props.dispatch(getRootContainer(this.props.currentSession.item));
     } else if (this.props.selectedProvider.id) {
       const requestedProvider = this.props.providers.items.find(provider => provider.id === this.props.selectedProvider.id);
       if (!requestedProvider) {
@@ -65,9 +67,11 @@ class UploadForm extends React.Component {
       }
 
       if (!providerSupportsAuth || this.props.currentAuthToken.authToken) {
-        console.log(requestedProvider);
-        console.log(this.props.currentAuthToken.authToken);
-        this.props.dispatch(createSession(this.props.selectedProvider, this.props.currentAuthToken.authToken));
+        // We only want to request a new session if one is not already being
+        // requested
+        if (!this.props.currentSession.isRequesting) {
+          this.props.dispatch(createSession(this.props.selectedProvider, this.props.currentAuthToken.authToken));
+        }
       }
     }
   }
@@ -82,7 +86,7 @@ class UploadForm extends React.Component {
 
           <Grid item xs={6} style={this.props.style.grid.item}>
             { this.state.providerSupportsAuth &&
-                <AuthButton style={this.props.style.authButton} handleClick={this.handleClickAuthButton} authorizationURL={this.props.selectedProvider.authorizationURL} disabled={this.props.currentAuthToken.authToken}/>
+                <AuthButton style={this.props.style.authButton} handleClick={this.handleClickAuthButton} authorizationUrl={this.props.selectedProvider.authorizationUrl} disabled={this.props.currentAuthToken.authToken}/>
             }
           </Grid>
 
@@ -115,13 +119,12 @@ UploadForm.propTypes = {
   selectedProvider: PropTypes.object.isRequired,
   providers: PropTypes.object.isRequired,
   currentAuthToken: PropTypes.object.isRequired,
+  currentSession: PropTypes.object.isRequired,
   dispatch: PropTypes.func.isRequired
 };
 
 UploadForm.defaultProps = {
   style: {
-    submit: {
-    },
     selectProvider: {
       formControl: {
         display: 'flex',

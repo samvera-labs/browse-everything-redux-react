@@ -7,7 +7,7 @@ import * as types from '../types';
 function requestSession() {
   return {
     type: types.REQUEST_SESSION,
-    currentSession: {},
+    session: {},
     isRequesting: true
   };
 }
@@ -21,7 +21,7 @@ function receiveSession(response) {
   return {
     type: types.RECEIVE_SESSION,
     isRequesting: false,
-    currentSession: data,
+    session: data,
     receivedAt: Date.now()
   };
 }
@@ -32,7 +32,7 @@ function postAndReceiveSession(provider, authToken) {
     dispatch(requestSession());
 
     const attributes = {
-      'provider_id': provider.id
+      provider_id: provider.id
     };
     const postData = {
       data: {
@@ -46,7 +46,7 @@ function postAndReceiveSession(provider, authToken) {
       postData['token'] = authToken;
     }
 
-    return api.createSession({data: {type: 'post', attributes: postData}}).then(response => {
+    return api.createSession(postData).then(response => {
       console.log(response);
       return dispatch(receiveSession(response));
     });
@@ -54,8 +54,6 @@ function postAndReceiveSession(provider, authToken) {
 }
 
 export function createSession(provider, authToken) {
-  return (dispatch, getState) => {
-    return dispatch(postAndReceiveSession(provider, authToken));
-  };
+  return dispatch => dispatch(postAndReceiveSession(provider, authToken));
 }
 
