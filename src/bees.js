@@ -9,7 +9,7 @@ const apiEndpoints = {
 };
 
 const config = {
-  baseUrl: process.env.REACT_APP_API_URL || 'http://localhost:3000/browse'
+  baseUrl: process.env.REACT_APP_API_URL || 'http://localhost:8082/api/browse'
 };
 
 export const api = buildApi(apiEndpoints, config);

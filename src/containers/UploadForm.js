@@ -7,44 +7,68 @@ import AuthButton from './AuthButton';
 import ResourceTree from './ResourceTree';
 import ResourceNode from './ResourceNode';
 import Grid from '@material-ui/core/Grid';
-import { selectProvider, getRootContainer, createSession } from '../actions';
+import { selectProvider, updateProviders, getRootContainer, createSession, authorize } from '../actions';
 import Paper from '@material-ui/core/Paper';
 
 class UploadForm extends React.Component {
+  // This should be refactored
+  state = {
+    providerSupportsAuth: false
+  }
+
   constructor(props) {
     super(props);
     this.handleChangeProvider = this.handleChangeProvider.bind(this)
     this.handleClickAuthButton = this.handleClickAuthButton.bind(this)
     this.handleAuthorize = this.handleAuthorize.bind(this)
-    this.authorizationURL = 'https://accounts.google.com/o/oauth2/auth?access_type=offline&approval_prompt=force&client_id=484835294878-9cg485q5tpqq6gna68ntntvnujt2dgt6.apps.googleusercontent.com&include_granted_scopes=true&redirect_uri=http://localhost:3000/browse/providers/google_drive/authorize&response_type=code&scope=https://www.googleapis.com/auth/drive';
   }
 
   handleChangeProvider(event) {
-    const provider = event.target.value;
+    const providerId = event.target.value;
+    const provider = this.props.providers.items.find(provider => provider.id === providerId);
     this.props.dispatch(selectProvider(provider));
   }
 
   handleClickAuthButton(event) {
     // This opens the new window for the OAuth
+    event.preventDefault();
     window.open(this.authorizationURL);
   }
 
   handleAuthorize(event) {
     // Update the state with the authorization
-    this.props.dispatch(authorize(event.authToken));
+    if (event.detail) {
+      this.props.dispatch(authorize(event.detail.authToken));
+    }
   }
 
   componentDidMount() {
-    //this.props.dispatch(getProviders());
-    window.addEventListener('browseEverything.authorize', this.handleAuthorize);
+    // Once the component mounts the DOM, retrieve all Providers from the API
+    this.props.dispatch(updateProviders());
+    window.document.addEventListener('browseEverything.authorize', this.handleAuthorize);
   }
 
-  componentDidUpdate(props) {
-
+  componentDidUpdate(prevProps) {
+    // If a Session has been established, retrieve all entries from the root
+    // container
     if (this.props.currentSession) {
       this.props.dispatch(getRootContainer(this.props.currentSession));
-    } else if (this.props.selectedProvider) {
-      this.props.dispatch(createSession(this.props.selectedProvider));
+    } else if (this.props.selectedProvider.id) {
+      const requestedProvider = this.props.providers.items.find(provider => provider.id === this.props.selectedProvider.id);
+      if (!requestedProvider) {
+        throw new Error(`Unsupported provider selected: ${this.props.selectedProvider.id}`)
+      }
+      // This is a point for a refactor
+      const providerSupportsAuth = !!requestedProvider.authorizationUrl;
+      if (providerSupportsAuth !== this.state.providerSupportsAuth) {
+        this.setState({ providerSupportsAuth: providerSupportsAuth });
+      }
+
+      if (!providerSupportsAuth || this.props.currentAuthToken.authToken) {
+        console.log(requestedProvider);
+        console.log(this.props.currentAuthToken.authToken);
+        this.props.dispatch(createSession(this.props.selectedProvider, this.props.currentAuthToken.authToken));
+      }
     }
   }
 
@@ -53,11 +77,13 @@ class UploadForm extends React.Component {
       <form className="upload">
         <Grid container spacing={3}>
           <Grid item xs={6}>
-            <SelectProvider style={this.props.style.selectProvider} handleChange={this.handleChangeProvider} provider={this.props.selectedProvider}/>
+            <SelectProvider style={this.props.style.selectProvider} handleChange={this.handleChangeProvider} selectedProvider={this.props.selectedProvider} providers={this.props.providers}/>
           </Grid>
 
           <Grid item xs={6} style={this.props.style.grid.item}>
-            <AuthButton style={this.props.style.authButton} handleClick={this.handleClickAuthButton} authorizationURL={this.authorizationURL}/>
+            { this.state.providerSupportsAuth &&
+                <AuthButton style={this.props.style.authButton} handleClick={this.handleClickAuthButton} authorizationURL={this.props.selectedProvider.authorizationURL} disabled={this.props.currentAuthToken.authToken}/>
+            }
           </Grid>
 
           <Grid container spacing={3} align="left">
@@ -86,9 +112,9 @@ class UploadForm extends React.Component {
 
 UploadForm.propTypes = {
   style: PropTypes.object,
-  selectedProvider: PropTypes.string.isRequired,
-  currentProvider: PropTypes.object,
-  authorization: PropTypes.object,
+  selectedProvider: PropTypes.object.isRequired,
+  providers: PropTypes.object.isRequired,
+  currentAuthToken: PropTypes.object.isRequired,
   dispatch: PropTypes.func.isRequired
 };
 
@@ -110,8 +136,7 @@ UploadForm.defaultProps = {
     authButton: {
       alignSelf: 'center'
     }
-  },
-  authorizationURL: 'https://accounts.google.com/o/oauth2/auth?access_type=offline&approval_prompt=force&client_id=484835294878-9cg485q5tpqq6gna68ntntvnujt2dgt6.apps.googleusercontent.com&include_granted_scopes=true&redirect_uri=http://localhost:3000/browse/providers/google_drive/authorize&response_type=code&scope=https://www.googleapis.com/auth/drive'
+  }
 }
 
 export default UploadForm;

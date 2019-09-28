@@ -19,9 +19,6 @@ class ResourceTree extends React.Component {
         <div>
           {!this.props.root && (
             <span>
-              <IconButton aria-label="expand or collapse" size="small">
-                <ArrowDownwardIcon fontSize="inherit" />
-              </IconButton>
               <Checkbox
                 checked={this.state.selected}
                 value="selected"
@@ -31,6 +28,9 @@ class ResourceTree extends React.Component {
                   }
                 }
               />
+              <IconButton aria-label="expand or collapse" size="small">
+                <ArrowDownwardIcon fontSize="inherit" />
+              </IconButton>
             </span>
           )}
           <span>{this.props.label}</span>

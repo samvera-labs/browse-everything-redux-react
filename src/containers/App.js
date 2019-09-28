@@ -16,7 +16,7 @@ class App extends React.Component {
           </Typography>
         </Container>
         <Container maxWidth="lg">
-          <UploadForm styles={this.props.style} dispatch={this.props.dispatch} selectedProvider={this.props.selectedProvider}/>
+          <UploadForm styles={this.props.style} dispatch={this.props.dispatch} selectedProvider={this.props.selectedProvider} currentAuthToken={this.props.currentAuthToken} providers={this.props.providers}/>
         </Container>
       </div>
     );
@@ -25,25 +25,31 @@ class App extends React.Component {
 
 App.propTypes = {
   style: PropTypes.object,
-  selectedProvider: PropTypes.string.isRequired,
-  providers: PropTypes.array.isRequired,
-  isRequesting: PropTypes.bool.isRequired,
-  lastUpdated: PropTypes.number,
+
+  selectedProvider: PropTypes.object.isRequired, // This should be updated to currentProvider
+  providers: PropTypes.object.isRequired,
+  currentAuthToken: PropTypes.object.isRequired,
+
   dispatch: PropTypes.func.isRequired
 };
 
 function mapStateToProps(state) {
-  const { selectedProvider, providers } = state
-  const { isRequesting, lastUpdated, items } = providers || {
-    isFetching: true,
+  const { selectedProvider, currentAuthToken } = state
+  //const providers = {
+  /*
+   items: [
+      { id: 'google_drive', name: 'Google Drive' }
+    ]
+   */
+  const providers = state.providers || {
+    isRequesting: false,
     items: []
   }
 
   return {
     selectedProvider,
-    providers: items,
-    isRequesting,
-    lastUpdated
+    providers,
+    currentAuthToken
   }
 }
 
