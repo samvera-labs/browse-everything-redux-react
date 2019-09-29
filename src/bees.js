@@ -5,10 +5,10 @@ const apiEndpoints = {
   getProvider: { method: get, path: '/providers/:id' },
   createSession: { method: post, path: '/sessions' },
   getRootContainer: { method: get, path: '/sessions/:id/containers' },
-  getContainer: { method: get, path: '/sessions/:id/containers/:id' }
+  getContainer: { method: get, path: '/sessions/:sessionId/containers/:id' }
 };
 
-const config = {
+export const config = {
   baseUrl: process.env.REACT_APP_API_URL || 'http://localhost:8082/api/browse'
 };
 
