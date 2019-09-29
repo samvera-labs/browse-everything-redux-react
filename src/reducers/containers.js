@@ -1,8 +1,16 @@
 import * as types from '../types';
 
-function updatedRootContainerState(state = {}, action) {
-  //let updatedRootContainer;
+function updateRootContainer(rootContainer, container) {
 
+  // This should be possible, but requires that the rootContainer.containers
+  // property be restructured from an Array to and Object
+  // rootContainer.containers[container.id] = container;
+  const containerIdx = rootContainer.containers.findIndex(child => child.id === container.id);
+  rootContainer.containers[containerIdx] = container;
+  return Object.assign({}, rootContainer);
+}
+
+function updatedRootContainerState(state = {}, action) {
   switch (action.type) {
     case types.REQUEST_ROOT_CONTAINER:
       return Object.assign({}, state, {
@@ -22,10 +30,11 @@ function updatedRootContainerState(state = {}, action) {
       });
     case types.RECEIVE_CONTAINER:
       // This needs to be removed and a new Action added
-      //updatedRootContainer = updateRootContainer(action.container);
+      const updatedRootContainer = updateRootContainer(state.item, action.item);
+
       return Object.assign({}, state, {
         isRequesting: false,
-        item: action.item,
+        item: updatedRootContainer,
         lastUpdated: action.receivedAt
       });
     default:
@@ -45,6 +54,8 @@ export function rootContainer(currentState = {}, action) {
   switch (action.type) {
     case types.REQUEST_ROOT_CONTAINER:
     case types.RECEIVE_ROOT_CONTAINER:
+    case types.REQUEST_CONTAINER:
+    case types.RECEIVE_CONTAINER:
       return Object.assign({}, state, updated);
     default:
       return state;

@@ -108,11 +108,8 @@ class UploadForm extends React.Component {
           <Grid container spacing={3} align="left">
             <Grid item xs={12}>
               <Paper>
-                <ResourceTree style={this.props.style.resourceTree} root={true} label="Current Files">
-
-                  {!this.state.rootContainerEmpty && this.props.rootContainer.item.containers.map(container => <ResourceTree key={container.id} style={this.props.style} label={container.name} />) }
-                  {!this.state.rootContainerEmpty && this.props.rootContainer.item.bytestreams.map(bytestream => <ResourceNode key={bytestream.id} style={this.props.style} label={bytestream.name} />) }
-                </ResourceTree>
+                {!this.state.rootContainerEmpty &&
+                  <ResourceTree style={this.props.style.resourceTree} root={true} label="Current Files" container={this.props.rootContainer.item} dispatch={this.props.dispatch} />}
               </Paper>
             </Grid>
           </Grid>
