@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import FormControl from '@material-ui/core/FormControl';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
+import InputLabel from '@material-ui/core/InputLabel';
 
 class SelectProvider extends React.Component {
   render() {
@@ -12,6 +13,7 @@ class SelectProvider extends React.Component {
 
     return (
       <FormControl variant="outlined" style={this.props.style.formControl}>
+        <InputLabel htmlFor="provider">Select a storage provider</InputLabel>
         <Select
           value={selectedValue}
           onChange={this.props.handleChange}
@@ -21,6 +23,7 @@ class SelectProvider extends React.Component {
               id: 'provider'
             }
           }
+          disabled={this.props.providers.items.length === 0}
         >
           {
             this.props.providers.items.map((provider) => {

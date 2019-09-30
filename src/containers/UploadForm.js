@@ -7,7 +7,7 @@ import AuthButton from './AuthButton';
 import ResourceTree from './ResourceTree';
 import ResourceNode from './ResourceNode';
 import Grid from '@material-ui/core/Grid';
-import { selectProvider, updateProviders, getRootContainer, createSession, authorize } from '../actions';
+import { selectProvider, updateProviders, getRootContainer, createSession, authorize, createUpload } from '../actions';
 import Paper from '@material-ui/core/Paper';
 
 class UploadForm extends React.Component {
@@ -22,6 +22,7 @@ class UploadForm extends React.Component {
     this.handleChangeProvider = this.handleChangeProvider.bind(this)
     this.handleClickAuthButton = this.handleClickAuthButton.bind(this)
     this.handleAuthorize = this.handleAuthorize.bind(this)
+    this.handleSubmit = this.handleSubmit.bind(this)
   }
 
   handleChangeProvider(event) {
@@ -41,6 +42,12 @@ class UploadForm extends React.Component {
     if (event.detail) {
       this.props.dispatch(authorize(event.detail.authToken));
     }
+  }
+
+  handleSubmit(event) {
+    event.preventDefault();
+
+    this.props.dispatch(createUpload(event.target));
   }
 
   componentDidMount() {
@@ -109,7 +116,8 @@ class UploadForm extends React.Component {
             <Grid item xs={12}>
               <Paper>
                 {!this.state.rootContainerEmpty &&
-                  <ResourceTree style={this.props.style.resourceTree} root={true} label="Current Files" container={this.props.rootContainer.item} dispatch={this.props.dispatch} />}
+                  <ResourceTree style={this.props.style.resourceTree} root={true} container={this.props.rootContainer.item} dispatch={this.props.dispatch} />}
+
               </Paper>
             </Grid>
           </Grid>
@@ -134,6 +142,7 @@ UploadForm.propTypes = {
   currentAuthToken: PropTypes.object.isRequired,
   currentSession: PropTypes.object.isRequired,
   rootContainer: PropTypes.object.isRequired,
+  currentUpload: PropTypes.object.isRequired,
 
   dispatch: PropTypes.func.isRequired
 };

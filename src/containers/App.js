@@ -24,6 +24,7 @@ class App extends React.Component {
             providers={this.props.providers}
             currentSession={this.props.currentSession}
             rootContainer={this.props.rootContainer}
+            currentUpload={this.props.currentUpload}
           />
         </Container>
       </div>
@@ -39,6 +40,7 @@ App.propTypes = {
   currentAuthToken: PropTypes.object.isRequired,
   currentSession: PropTypes.object.isRequired,
   rootContainer: PropTypes.object.isRequired,
+  currentUpload: PropTypes.object.isRequired,
 
   dispatch: PropTypes.func.isRequired
 };
@@ -57,13 +59,18 @@ function mapStateToProps(state) {
     isRequesting: false,
     item: {}
   }
+  const currentUpload = state.currentUpload || {
+    isRequesting: false,
+    item: {}
+  }
 
   return {
     selectedProvider,
     providers,
     currentAuthToken,
     currentSession,
-    rootContainer
+    rootContainer,
+    currentUpload
   }
 }
 
