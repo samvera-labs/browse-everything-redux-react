@@ -2,7 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Checkbox from '@material-ui/core/Checkbox';
 import IconButton from '@material-ui/core/IconButton';
-import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
+import FolderIcon from '@material-ui/icons/Folder';
+import FolderOpenIcon from '@material-ui/icons/FolderOpen';
 import { getContainer } from '../actions';
 import ResourceNode from './ResourceNode';
 
@@ -16,10 +17,16 @@ class ResourceTree extends React.Component {
     super(props);
 
     this.handleExpand = this.handleExpand.bind(this);
+    this.handleCollapse = this.handleCollapse.bind(this);
   }
 
   handleExpand(event) {
     this.props.dispatch(getContainer(this.props.container));
+    this.setState({expanded: true});
+  }
+
+  handleCollapse(event) {
+    this.setState({expanded: false});
   }
 
   render() {
@@ -37,8 +44,12 @@ class ResourceTree extends React.Component {
                   }
                 }
               />
-              <IconButton aria-label="expand or collapse" size="small" onClick={this.handleExpand}>
-                <ArrowDownwardIcon fontSize="inherit" onClick={this.handleExpand} />
+              <IconButton aria-label="expand or collapse" size="small">
+                {this.state.expanded ? (
+                  <FolderOpenIcon fontSize="" onClick={this.handleCollapse} />
+                ) : (
+                  <FolderIcon fontSize="" onClick={this.handleExpand} />
+                )}
               </IconButton>
             </span>
           )}
@@ -59,7 +70,7 @@ ResourceTree.propTypes = {
   selected: PropTypes.bool,
   expanded: PropTypes.bool,
   root: PropTypes.bool,
-  label: PropTypes.string.isRequired,
+  label: PropTypes.string,
   dispatch: PropTypes.func.isRequired,
   container: PropTypes.object
 };
