@@ -2,6 +2,40 @@ import { api } from '../bees';
 import * as types from '../types';
 
 /**
+ * Handling state changes for bytestreams
+ */
+export function deselectBytestreamForUpload(bytestream) {
+  return {
+    type: types.DESELECT_BYTESTREAM,
+    selected: bytestream
+  };
+}
+
+export function selectBytestreamForUpload(bytestream) {
+  return {
+    type: types.SELECT_BYTESTREAM,
+    selected: bytestream
+  };
+}
+
+/**
+ * Handling state changes for containers
+ */
+export function deselectContainerForUpload(container) {
+  return {
+    type: types.DESELECT_CONTAINER,
+    selected: container
+  };
+}
+
+export function selectContainerForUpload(container) {
+  return {
+    type: types.SELECT_CONTAINER,
+    selected: container
+  };
+}
+
+/**
  * Requesting all of the providers from the API
  */
 function requestUpload() {
@@ -42,9 +76,11 @@ function postAndReceiveUpload(provider, authToken) {
     dispatch(requestUpload());
 
     const state = getState();
+    // THIS NEEDS TO BE CHANGED
+    const upload = state.currentUpload;
     const session = state.currentSession.item;
-    const selectedBytestreams = state.selectedBytestreams;
-    const selectedContainers = state.selectedContainers;
+    const selectedBytestreams = upload.bytestreams;
+    const selectedContainers = upload.containers;
 
     const attributes = {
       session_id: session.id,
