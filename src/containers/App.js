@@ -61,7 +61,10 @@ function mapStateToProps(state) {
   }
   const currentUpload = state.currentUpload || {
     isRequesting: false,
-    item: {}
+    item: {
+      containers: [],
+      bytestreams: []
+    }
   }
 
   return {

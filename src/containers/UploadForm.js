@@ -14,7 +14,8 @@ class UploadForm extends React.Component {
   // This should be refactored
   state = {
     providerSupportsAuth: false,
-    rootContainerEmpty: true
+    rootContainerEmpty: true,
+    currentUploadEmpty: true
   }
 
   constructor(props) {
@@ -25,12 +26,18 @@ class UploadForm extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this)
   }
 
+  /**
+   * This changes the provider when users select from the dropdown
+   */
   handleChangeProvider(event) {
     const providerId = event.target.value;
     const provider = this.props.providers.items.find(provider => provider.id === providerId);
     this.props.dispatch(selectProvider(provider));
   }
 
+  /**
+   * This initiates the OAuth2 workflow in another browser window or tab
+   */
   handleClickAuthButton(event) {
     // This opens the new window for the OAuth
     event.preventDefault();
@@ -56,6 +63,13 @@ class UploadForm extends React.Component {
     window.document.addEventListener('browseEverything.authorize', this.handleAuthorize);
   }
 
+  /**
+   * This requires a signficant refactor
+   * Perhaps decomposing some components will be necessary in order to more
+   * properly structure this
+   *
+   * This is also likely where the performance issues are arising
+   */
   componentDidUpdate(prevProps) {
     // If a Session has been established, retrieve all entries from the root
     // container
@@ -66,6 +80,11 @@ class UploadForm extends React.Component {
     const rootContainerEmpty = Object.keys(this.props.rootContainer.item).length === 0;
     if (this.state.rootContainerEmpty !== rootContainerEmpty) {
       this.setState({rootContainerEmpty: rootContainerEmpty});
+    }
+
+    const currentUploadEmpty = this.props.currentUpload.item.containers.length === 0 && this.props.currentUpload.item.bytestreams.length === 0;
+    if (this.state.currentUploadEmpty !== currentUploadEmpty) {
+      this.setState({currentUploadEmpty: currentUploadEmpty});
     }
 
     // If the session is established and there is no root container, request it
@@ -100,15 +119,25 @@ class UploadForm extends React.Component {
 
   render() {
     return (
-      <form className="upload">
+      <form className="upload" onSubmit={this.handleSubmit}>
         <Grid container spacing={3}>
           <Grid item xs={6}>
-            <SelectProvider style={this.props.style.selectProvider} handleChange={this.handleChangeProvider} selectedProvider={this.props.selectedProvider} providers={this.props.providers}/>
+            <SelectProvider
+                style={this.props.style.selectProvider}
+                handleChange={this.handleChangeProvider}
+                selectedProvider={this.props.selectedProvider}
+                providers={this.props.providers}
+            />
           </Grid>
 
           <Grid item xs={6} style={this.props.style.grid.item}>
-            { this.state.providerSupportsAuth &&
-                <AuthButton style={this.props.style.authButton} handleClick={this.handleClickAuthButton} authorizationUrl={this.props.selectedProvider.authorizationUrl} disabled={this.props.currentAuthToken.authToken}/>
+            {this.state.providerSupportsAuth &&
+              <AuthButton
+                style={this.props.style.authButton}
+                handleClick={this.handleClickAuthButton}
+                authorizationUrl={this.props.selectedProvider.authorizationUrl}
+                disabled={!!this.props.currentAuthToken.authToken}
+              />
             }
           </Grid>
 
@@ -116,15 +145,25 @@ class UploadForm extends React.Component {
             <Grid item xs={12}>
               <Paper>
                 {!this.state.rootContainerEmpty &&
-                  <ResourceTree style={this.props.style.resourceTree} root={true} container={this.props.rootContainer.item} dispatch={this.props.dispatch} />}
-
+                  <ResourceTree
+                    style={this.props.style.resourceTree}
+                    root={true}
+                    container={this.props.rootContainer.item}
+                    dispatch={this.props.dispatch}
+                  />
+                }
               </Paper>
             </Grid>
           </Grid>
 
           <Grid item xs={12} align="left">
             <label htmlFor="upload-form-submit">
-              <Button variant="contained" color="primary" style={this.props.style.submit}>Upload</Button>
+              <Button
+                variant="contained"
+                color="primary"
+                style={this.props.style.submit}
+                disabled={this.state.currentUploadEmpty}
+              >Upload</Button>
             </label>
           </Grid>
 

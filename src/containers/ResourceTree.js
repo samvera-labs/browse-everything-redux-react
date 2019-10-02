@@ -4,20 +4,22 @@ import Checkbox from '@material-ui/core/Checkbox';
 import IconButton from '@material-ui/core/IconButton';
 import FolderIcon from '@material-ui/icons/Folder';
 import FolderOpenIcon from '@material-ui/icons/FolderOpen';
-import { getContainer } from '../actions';
+import { getContainer, selectContainerForUpload, deselectContainerForUpload } from '../actions';
 import ResourceNode from './ResourceNode';
 
 class ResourceTree extends React.Component {
-  state = {
-    selected: false,
-    expanded: false
-  }
-
   constructor(props) {
     super(props);
 
     this.handleExpand = this.handleExpand.bind(this);
     this.handleCollapse = this.handleCollapse.bind(this);
+    this.handleChecked = this.handleChecked.bind(this);
+
+    // Root trees are always expanded and cannot be collapsed
+    this.state = {
+      expanded: this.props.root,
+      selected: this.props.selected
+    };
   }
 
   handleExpand(event) {
@@ -29,6 +31,18 @@ class ResourceTree extends React.Component {
     this.setState({expanded: false});
   }
 
+  handleChecked(event) {
+    if (this.state.selected !== event.target.checked) {
+      this.setState({selected: event.target.checked});
+    }
+
+    if (event.target.checked) {
+      this.props.dispatch(selectContainerForUpload(this.props.container));
+    } else {
+      this.props.dispatch(deselectContainerForUpload(this.props.container));
+    }
+  }
+
   render() {
     return (
       <div>
@@ -37,6 +51,7 @@ class ResourceTree extends React.Component {
             <span>
               <Checkbox
                 checked={this.state.selected}
+                onChange={this.handleChecked}
                 value="selected"
                 inputProps={
                   {
@@ -44,11 +59,15 @@ class ResourceTree extends React.Component {
                   }
                 }
               />
-              <IconButton aria-label="expand or collapse" size="small">
+              <IconButton
+                aria-label="expand or collapse"
+                size="small"
+                onClick={this.state.expanded ? this.handleCollapse : this.handleExpand}>
+
                 {this.state.expanded ? (
-                  <FolderOpenIcon fontSize="" onClick={this.handleCollapse} />
+                  <FolderOpenIcon fontSize=""/>
                 ) : (
-                  <FolderIcon fontSize="" onClick={this.handleExpand} />
+                  <FolderIcon fontSize=""/>
                 )}
               </IconButton>
             </span>
@@ -57,8 +76,26 @@ class ResourceTree extends React.Component {
         </div>
 
         <div>
-          {this.props.container.containers.map(child => <ResourceTree key={child.id} label={child.name} container={child} dispatch={this.props.dispatch} styles={this.props.styles} />)}
-          {this.props.container.bytestreams.map(child => <ResourceNode key={child.id} label={child.name} styles={this.props.styles} />)}
+          {this.state.expanded && this.props.container.containers.map(child =>
+            <ResourceTree
+              key={child.id}
+              label={child.name}
+              container={child}
+              dispatch={this.props.dispatch}
+              selected={this.state.selected}
+              styles={this.props.styles}
+            />
+          )}
+          {this.state.expanded && this.props.container.bytestreams.map(child =>
+            <ResourceNode
+              key={child.id}
+              label={child.name}
+              styles={this.props.styles}
+              bytestream={child}
+              selected={this.state.selected}
+              dispatch={this.props.dispatch}
+            />
+          )}
         </div>
       </div>
     );
@@ -68,7 +105,6 @@ class ResourceTree extends React.Component {
 ResourceTree.propTypes = {
   styles: PropTypes.object,
   selected: PropTypes.bool,
-  expanded: PropTypes.bool,
   root: PropTypes.bool,
   label: PropTypes.string,
   dispatch: PropTypes.func.isRequired,
@@ -77,7 +113,6 @@ ResourceTree.propTypes = {
 
 ResourceTree.defaultProps = {
   selected: false,
-  expanded: false,
   root: false
 };
 
