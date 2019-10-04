@@ -20,10 +20,12 @@ class UploadForm extends React.Component {
 
   constructor(props) {
     super(props);
-    this.handleChangeProvider = this.handleChangeProvider.bind(this)
-    this.handleClickAuthButton = this.handleClickAuthButton.bind(this)
-    this.handleAuthorize = this.handleAuthorize.bind(this)
-    this.handleSubmit = this.handleSubmit.bind(this)
+    this.handleChangeProvider = this.handleChangeProvider.bind(this);
+    this.handleClickAuthButton = this.handleClickAuthButton.bind(this);
+    this.handleAuthorize = this.handleAuthorize.bind(this);
+    /** @todo Investigate why this isn't being propagate */
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleClickSubmit = this.handleClickSubmit.bind(this);
   }
 
   /**
@@ -51,10 +53,16 @@ class UploadForm extends React.Component {
     }
   }
 
+  // @todo Address why this is not being triggered by the Material UI Button
+  // The Button should propagate a <form> submit event
   handleSubmit(event) {
     event.preventDefault();
 
     this.props.dispatch(createUpload(event.target));
+  }
+
+  handleClickSubmit(event) {
+    this.props.dispatch(createUpload(this.props.currentAuthToken.authToken));
   }
 
   componentDidMount() {
@@ -163,6 +171,7 @@ class UploadForm extends React.Component {
                 color="primary"
                 style={this.props.style.submit}
                 disabled={this.state.currentUploadEmpty}
+                onClick={this.handleClickSubmit}
               >Upload</Button>
             </label>
           </Grid>

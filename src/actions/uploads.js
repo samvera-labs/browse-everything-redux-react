@@ -48,9 +48,10 @@ function requestUpload() {
 function buildUpload(data) {
   const upload = {};
 
-  upload.authorizations = data.relationships.authorizations;
-  upload.provider = data.relationships.provider;
   upload.id = data.id
+  upload.session = data.relationships.session.data;
+  upload.bytestream_ids = data.attributes.bytestream_ids;
+  upload.container_ids = data.attributes.container_ids;
 
   return upload;
 }
@@ -70,14 +71,14 @@ function receiveUpload(response) {
   };
 }
 
-function postAndReceiveUpload(provider, authToken) {
+function postAndReceiveUpload(authToken) {
   return (dispatch, getState) => {
     // Ensure that the auth. token is loaded
     dispatch(requestUpload());
 
     const state = getState();
     // THIS NEEDS TO BE CHANGED
-    const upload = state.currentUpload;
+    const upload = state.currentUpload.item;
     const session = state.currentSession.item;
     const selectedBytestreams = upload.bytestreams;
     const selectedContainers = upload.containers;
@@ -105,6 +106,6 @@ function postAndReceiveUpload(provider, authToken) {
   };
 }
 
-export function createUpload(provider, authToken) {
-  return dispatch => dispatch(postAndReceiveUpload(provider, authToken));
+export function createUpload(authToken) {
+  return dispatch => dispatch(postAndReceiveUpload(authToken));
 }
