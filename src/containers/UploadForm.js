@@ -1,19 +1,30 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import './UploadForm.css';
 import Button from '@material-ui/core/Button';
-import PropTypes from 'prop-types';
+import Grid from '@material-ui/core/Grid';
+import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography';
+
 import SelectProvider from './SelectProvider';
 import AuthButton from './AuthButton';
 import ResourceTree from './ResourceTree';
-import ResourceNode from './ResourceNode';
-import Grid from '@material-ui/core/Grid';
-import { selectProvider, updateProviders, getRootContainer, createSession, authorize, createUpload } from '../actions';
-import Paper from '@material-ui/core/Paper';
+import {
+  selectProvider,
+  updateProviders,
+  getRootContainer,
+  createSession,
+  clearSession,
+  authorize,
+  createUpload
+} from '../actions';
 
 class UploadForm extends React.Component {
   // This should be refactored
   state = {
     providerSupportsAuth: false,
+    currentSessionEmpty: true,
     rootContainerEmpty: true,
     currentUploadEmpty: true
   }
@@ -23,8 +34,7 @@ class UploadForm extends React.Component {
     this.handleChangeProvider = this.handleChangeProvider.bind(this);
     this.handleClickAuthButton = this.handleClickAuthButton.bind(this);
     this.handleAuthorize = this.handleAuthorize.bind(this);
-    /** @todo Investigate why this isn't being propagate */
-    this.handleSubmit = this.handleSubmit.bind(this);
+    /** @todo Investigate why <form onSubmit> isn't being dispatched */
     this.handleClickSubmit = this.handleClickSubmit.bind(this);
   }
 
@@ -53,15 +63,7 @@ class UploadForm extends React.Component {
     }
   }
 
-  // @todo Address why this is not being triggered by the Material UI Button
-  // The Button should propagate a <form> submit event
-  handleSubmit(event) {
-    event.preventDefault();
-
-    this.props.dispatch(createUpload(event.target));
-  }
-
-  handleClickSubmit(event) {
+  handleClickSubmit() {
     this.props.dispatch(createUpload(this.props.currentAuthToken.authToken));
   }
 
@@ -71,6 +73,33 @@ class UploadForm extends React.Component {
     window.document.addEventListener('browseEverything.authorize', this.handleAuthorize);
   }
 
+  updateCurrentSessionEmpty(currentSessionEmpty) {
+    if (this.state.currentSessionEmpty !== currentSessionEmpty) {
+      this.setState({currentSessionEmpty: currentSessionEmpty});
+    }
+  }
+
+  updateRootContainerEmpty(rootContainerEmpty) {
+    // Request the root container if the Session is already established
+    if (this.state.rootContainerEmpty !== rootContainerEmpty) {
+      this.setState({rootContainerEmpty: rootContainerEmpty});
+    }
+  }
+
+  updateCurrentUploadEmpty(currentUploadEmpty) {
+    if (this.state.currentUploadEmpty !== currentUploadEmpty) {
+      this.setState({currentUploadEmpty: currentUploadEmpty});
+    }
+  }
+
+  updateProviderSupportsAuth(providerSupportsAuth) {
+    // Update the state when a provider has been selected which supports/does
+    // not support authentication
+    if (providerSupportsAuth !== this.state.providerSupportsAuth) {
+      this.setState({ providerSupportsAuth: providerSupportsAuth });
+    }
+  }
+
   /**
    * This requires a signficant refactor
    * Perhaps decomposing some components will be necessary in order to more
@@ -78,42 +107,49 @@ class UploadForm extends React.Component {
    *
    * This is also likely where the performance issues are arising
    */
-  componentDidUpdate(prevProps) {
-    // If a Session has been established, retrieve all entries from the root
-    // container
-
-    // Request the root container if the Session is already established
-    // This requires a refactor
+  componentDidUpdate() {
     const currentSessionEmpty = Object.keys(this.props.currentSession.item).length === 0;
+    this.updateCurrentSessionEmpty(currentSessionEmpty);
+
     const rootContainerEmpty = Object.keys(this.props.rootContainer.item).length === 0;
-    if (this.state.rootContainerEmpty !== rootContainerEmpty) {
-      this.setState({rootContainerEmpty: rootContainerEmpty});
-    }
+    this.updateRootContainerEmpty(rootContainerEmpty);
 
     const currentUploadEmpty = this.props.currentUpload.item.containers.length === 0 && this.props.currentUpload.item.bytestreams.length === 0;
-    if (this.state.currentUploadEmpty !== currentUploadEmpty) {
-      this.setState({currentUploadEmpty: currentUploadEmpty});
-    }
+    this.updateCurrentUploadEmpty(currentUploadEmpty);
 
-    // If the session is established and there is no root container, request it
-    // and build the file tree
-    if (!currentSessionEmpty && rootContainerEmpty) {
+    if (!this.state.currentSessionEmpty && this.props.currentUpload.item.id) {
+      const uploadEvent = new CustomEvent('browseEverything.upload', { detail: this.props.currentUpload.item });
+      window.dispatchEvent(uploadEvent);
+      if (this.props.onUpload) {
+        this.props.onUpload.call(this, uploadEvent);
+      }
+
+      // Reinitializing the state does not re-render the components
+      // This does not seem right, probably another point to refactor
+      this.setState({
+        providerSupportsAuth: false,
+        currentSessionEmpty: true,
+        rootContainerEmpty: true,
+        currentUploadEmpty: true
+      });
+      this.props.dispatch(clearSession());
+    } else if (!this.state.currentSessionEmpty && this.state.rootContainerEmpty) {
+
+      // If the session is established and there is no root container, request it
+      //   and build the file tree
       if (!this.props.rootContainer.isRequesting) {
         this.props.dispatch(getRootContainer(this.props.currentSession.item, this.props.currentAuthToken.authToken));
       }
-    } else if (currentSessionEmpty && this.props.selectedProvider.id) {
+    } else if (this.state.currentSessionEmpty && this.props.selectedProvider.id) {
+
       // If there is no session and a provider has been selected, create a
-      // session
+      //   session
       const requestedProvider = this.props.providers.items.find(provider => provider.id === this.props.selectedProvider.id);
       if (!requestedProvider) {
         throw new Error(`Unsupported provider selected: ${this.props.selectedProvider.id}`)
       }
-
-      // This is a point for a refactor
       const providerSupportsAuth = !!requestedProvider.authorizationUrl;
-      if (providerSupportsAuth !== this.state.providerSupportsAuth) {
-        this.setState({ providerSupportsAuth: providerSupportsAuth });
-      }
+      this.updateProviderSupportsAuth(providerSupportsAuth);
 
       if (!providerSupportsAuth || this.props.currentAuthToken.authToken) {
         // We only want to request a new session if one is not already being
@@ -126,8 +162,25 @@ class UploadForm extends React.Component {
   }
 
   render() {
+    let rootContainerContent;
+
+    if(this.props.currentUpload.isRequesting) {
+      rootContainerContent = <Typography variant="h3" component="div">Uploading files...</Typography>;
+    } else if (!this.state.rootContainerEmpty) {
+      rootContainerContent = <ResourceTree
+                               style={this.props.style.resourceTree}
+                               root={true}
+                               container={this.props.rootContainer.item}
+                               dispatch={this.props.dispatch}
+                             />;
+    } else if(!!this.props.currentAuthToken.authToken) {
+      rootContainerContent = <Typography variant="h3" component="div">Loading content...</Typography>;
+    } else {
+      rootContainerContent = <Typography variant="h3" component="div">Please select a provider</Typography>;
+    }
+
     return (
-      <form className="upload" onSubmit={this.handleSubmit}>
+      <form className="upload">
         <Grid container spacing={3}>
           <Grid item xs={6}>
             <SelectProvider
@@ -151,16 +204,7 @@ class UploadForm extends React.Component {
 
           <Grid container spacing={3} align="left">
             <Grid item xs={12}>
-              <Paper>
-                {!this.state.rootContainerEmpty &&
-                  <ResourceTree
-                    style={this.props.style.resourceTree}
-                    root={true}
-                    container={this.props.rootContainer.item}
-                    dispatch={this.props.dispatch}
-                  />
-                }
-              </Paper>
+              <Paper>{rootContainerContent}</Paper>
             </Grid>
           </Grid>
 
@@ -170,7 +214,7 @@ class UploadForm extends React.Component {
                 variant="contained"
                 color="primary"
                 style={this.props.style.submit}
-                disabled={this.state.currentUploadEmpty}
+                disabled={this.state.currentUploadEmpty || this.props.currentUpload.isRequesting}
                 onClick={this.handleClickSubmit}
               >Upload</Button>
             </label>
@@ -192,7 +236,8 @@ UploadForm.propTypes = {
   rootContainer: PropTypes.object.isRequired,
   currentUpload: PropTypes.object.isRequired,
 
-  dispatch: PropTypes.func.isRequired
+  dispatch: PropTypes.func.isRequired,
+  onUpload: PropTypes.func
 };
 
 UploadForm.defaultProps = {

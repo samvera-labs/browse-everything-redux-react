@@ -67,6 +67,8 @@ export function currentUpload(currentState = {}, action) {
     case types.SELECT_BYTESTREAM:
     case types.DESELECT_BYTESTREAM:
       return Object.assign({}, state, updated);
+    case types.CLEAR_SESSION:
+      return initialState;
     default:
       return state;
   }

@@ -1,6 +1,12 @@
 import { api } from '../bees';
 import * as types from '../types';
 
+export function clearUpload() {
+  return {
+    type: types.CLEAR_UPLOAD
+  };
+}
+
 /**
  * Handling state changes for bytestreams
  */
@@ -50,8 +56,9 @@ function buildUpload(data) {
 
   upload.id = data.id
   upload.session = data.relationships.session.data;
-  upload.bytestream_ids = data.attributes.bytestream_ids;
-  upload.container_ids = data.attributes.container_ids;
+  // @todo This should be restructured
+  upload.bytestreams = data.attributes.bytestream_ids.map(id => { return { 'id': id } });
+  upload.containers = data.attributes.container_ids.map(id => { return { 'id': id } });
 
   return upload;
 }
