@@ -17,8 +17,6 @@ function updatedRootContainerState(state = {}, action) {
         isRequesting: true
       });
     case types.RECEIVE_ROOT_CONTAINER:
-      // This needs to be removed and a new Action added
-      //updatedRootContainer = getRootContainer(action.rootContainer);
       return Object.assign({}, state, {
         isRequesting: false,
         item: action.item,
@@ -57,6 +55,8 @@ export function rootContainer(currentState = {}, action) {
     case types.REQUEST_CONTAINER:
     case types.RECEIVE_CONTAINER:
       return Object.assign({}, state, updated);
+    case types.CLEAR_SESSION:
+      return initialState;
     default:
       return state;
   }

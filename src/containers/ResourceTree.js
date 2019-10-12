@@ -1,10 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+
 import Checkbox from '@material-ui/core/Checkbox';
-import IconButton from '@material-ui/core/IconButton';
 import FolderIcon from '@material-ui/icons/Folder';
 import FolderOpenIcon from '@material-ui/icons/FolderOpen';
-import { getContainer, selectContainerForUpload, deselectContainerForUpload } from '../actions';
+import IconButton from '@material-ui/core/IconButton';
+
+import {
+  getContainer,
+  selectContainerForUpload,
+  deselectContainerForUpload
+} from '../actions';
 import ResourceNode from './ResourceNode';
 
 class ResourceTree extends React.Component {

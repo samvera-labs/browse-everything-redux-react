@@ -9,10 +9,11 @@ import InputLabel from '@material-ui/core/InputLabel';
 class SelectProvider extends React.Component {
   render() {
     const value = this.props.selectedProvider.id ? this.props.selectedProvider.id : "";
+    const inputLabel = this.props.providers.isRequesting ? "Loading providers..." : "Select a storage provider";
 
     return (
       <FormControl variant="outlined" style={this.props.style.formControl}>
-        <InputLabel htmlFor="provider">Select a storage provider</InputLabel>
+        <InputLabel htmlFor="provider">{inputLabel}</InputLabel>
         <Select
           value={value}
           onChange={this.props.handleChange}

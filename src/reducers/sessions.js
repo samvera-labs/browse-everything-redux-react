@@ -34,6 +34,8 @@ export function session(currentState = {}, action) {
     case types.REQUEST_SESSION:
     case types.RECEIVE_SESSION:
       return Object.assign({}, state, updated);
+    case types.CLEAR_SESSION:
+      return initialState;
     default:
       return state;
   }

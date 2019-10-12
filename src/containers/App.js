@@ -19,6 +19,7 @@ class App extends React.Component {
           <UploadForm
             styles={this.props.style}
             dispatch={this.props.dispatch}
+            onUpload={this.props.onUpload}
             selectedProvider={this.props.selectedProvider}
             currentAuthToken={this.props.currentAuthToken}
             providers={this.props.providers}
@@ -42,7 +43,8 @@ App.propTypes = {
   rootContainer: PropTypes.object.isRequired,
   currentUpload: PropTypes.object.isRequired,
 
-  dispatch: PropTypes.func.isRequired
+  dispatch: PropTypes.func.isRequired,
+  onUpload: PropTypes.func
 };
 
 function mapStateToProps(state) {

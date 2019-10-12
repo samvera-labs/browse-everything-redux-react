@@ -8,6 +8,8 @@ export function authToken(state = {}, action) {
         lastUpdated: action.receivedAt
       }
       return Object.assign({}, state, updated);
+    case types.CLEAR_SESSION:
+      return {};
     default:
       return state;
   }

@@ -1,6 +1,12 @@
 import { api, config } from '../bees';
 import * as types from '../types';
 
+export function clearRootContainer() {
+  return {
+    type: types.CLEAR_ROOT_CONTAINER
+  }
+}
+
 /**
  * Build a bytestream object from JSON-API responses
  */
@@ -97,8 +103,6 @@ function requestContainer() {
 }
 
 function receiveContainer(response, rootContainer) {
-  //const body = response.body;
-  //const data = body.data;
   // This approach is used here because now Bees no longer works :(
   const data = response.data;
 
@@ -145,20 +149,11 @@ function requestAndReceiveContainer(session, authToken, rootContainer, container
 }
 
 export function getContainer(container) {
-
   return(dispatch, getState) => {
     const state = getState();
-    // Because the reducers modify the root container, this should only check
-    // for whether or not the root container is being modified
-    //if (shouldRequestRootContainer(state)) {
-    //if (!state.rootContainer.isRequesting) {
-
-      console.log(state);
-      console.log(container);
-      const session = state.currentSession.item;
-      const authToken = state.currentAuthToken.authToken;
-      const rootContainer = state.rootContainer.item;
-      return dispatch(requestAndReceiveContainer(session, authToken, rootContainer, container));
-    //}
+    const session = state.currentSession.item;
+    const authToken = state.currentAuthToken.authToken;
+    const rootContainer = state.rootContainer.item;
+    return dispatch(requestAndReceiveContainer(session, authToken, rootContainer, container));
   }
 }

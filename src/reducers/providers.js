@@ -10,6 +10,8 @@ export function selectedProvider(currentState = {}, action) {
   switch (action.type) {
     case types.SELECT_PROVIDER:
       return action.provider;
+    case types.CLEAR_SESSION:
+      return initialState;
     default:
       return state;
   }
@@ -53,6 +55,8 @@ export function providers(currentState = {}, action) {
     case types.REQUEST_PROVIDERS:
     case types.RECEIVE_PROVIDERS:
       return Object.assign({}, state, updated);
+    case types.CLEAR_SESSION:
+      return initialState;
     default:
       return state;
   }

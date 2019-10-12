@@ -1,6 +1,12 @@
 import { api } from '../bees';
 import * as types from '../types';
 
+export function clearSession() {
+  return {
+    type: types.CLEAR_SESSION
+  }
+}
+
 /**
  * Requesting all of the providers from the API
  */
