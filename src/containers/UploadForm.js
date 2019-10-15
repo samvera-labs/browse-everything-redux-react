@@ -58,8 +58,8 @@ class UploadForm extends React.Component {
 
   handleAuthorize(event) {
     // Update the state with the authorization
-    if (event.detail) {
-      this.props.dispatch(authorize(event.detail.authToken));
+    if (event.data && event.data.authToken) {
+      this.props.dispatch(authorize(event.data.authToken));
     }
   }
 
@@ -70,7 +70,7 @@ class UploadForm extends React.Component {
   componentDidMount() {
     // Once the component mounts the DOM, retrieve all Providers from the API
     this.props.dispatch(updateProviders());
-    window.document.addEventListener('browseEverything.authorize', this.handleAuthorize);
+    window.addEventListener('message', this.handleAuthorize);
   }
 
   updateCurrentSessionEmpty(currentSessionEmpty) {
