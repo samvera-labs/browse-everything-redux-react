@@ -2,26 +2,16 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
-import { makeStyles } from '@material-ui/core/styles';
 import BrowseEverything from './containers/BrowseEverything';
 
-
-//import 'babel-polyfill';
-
-// Static or instance methods raise conflicts with Hooks
-/*
- * Define the style rules
+/**
+ * This the more proper way of working with the MaterialUI approach for CSS and
+ *  theming.  Unfortunately, using this at the the component-level requires
+ *  restructuring in order to more properly use `makeStyles` as a hook for
+ *  functional components.
+ *
+ * ReactDOM.render(<App styles={makeStyles(definedStyles)} />, document.getElementById('root'));
  */
-const definedStyles = theme => ({
-  button: {
-    margin: theme.spacing(1)
-  },
-  input: {
-    display: 'none'
-  }
-});
-
-//ReactDOM.render(<App styles={makeStyles(definedStyles)} />, document.getElementById('root'));
 ReactDOM.render(<BrowseEverything />, document.getElementById('root'))
 
 // If you want your app to work offline and load faster, you can change

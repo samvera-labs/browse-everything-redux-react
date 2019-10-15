@@ -35,6 +35,7 @@ export function requestProviders() {
 function buildProviders(data) {
   const providers = [];
 
+  // eslint-disable-next-line no-unused-vars
   for (const values of data) {
     const provider = values.attributes;
 
