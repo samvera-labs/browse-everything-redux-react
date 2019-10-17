@@ -2,10 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import './UploadForm.css';
+
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
+import { withStyles } from '@material-ui/core/styles';
 
 import SelectProvider from './SelectProvider';
 import AuthButton from './AuthButton';
@@ -162,39 +164,40 @@ class UploadForm extends React.Component {
   }
 
   render() {
-    let rootContainerContent;
+    let resourceTree;
 
-    if(this.props.currentUpload.isRequesting) {
-      rootContainerContent = <Typography variant="h3" component="div">Uploading files...</Typography>;
-    } else if (!this.state.rootContainerEmpty) {
-      rootContainerContent = <ResourceTree
-                               style={this.props.style.resourceTree}
+    if (!this.props.currentUpload.isRequesting && !this.state.rootContainerEmpty) {
+      resourceTree = <ResourceTree
                                root={true}
                                container={this.props.rootContainer.item}
                                dispatch={this.props.dispatch}
                              />;
-    } else if(!!this.props.currentAuthToken.authToken) {
-      rootContainerContent = <Typography variant="h3" component="div">Loading content...</Typography>;
     } else {
-      rootContainerContent = <Typography variant="h3" component="div">Please select a provider</Typography>;
+      let rootContainerText = 'Please select a provider';
+
+      if (this.props.currentUpload.isRequesting) {
+        rootContainerText = 'Uploading files...';
+      } else if (!!this.props.currentAuthToken.authToken) {
+        rootContainerText = 'Loading content...';
+      }
+
+      resourceTree = <Typography className={this.props.classes.resourceTree} variant="body1" component="div">{rootContainerText}</Typography>;
     }
 
     return (
-      <form className="upload">
+      <form className={this.props.classes.root}>
         <Grid container spacing={3}>
           <Grid item xs={6}>
             <SelectProvider
-                style={this.props.style.selectProvider}
                 handleChange={this.handleChangeProvider}
                 selectedProvider={this.props.selectedProvider}
                 providers={this.props.providers}
             />
           </Grid>
 
-          <Grid item xs={6} style={this.props.style.grid.item}>
+          <Grid item xs={6} className={this.props.classes.grid.item}>
             {this.state.providerSupportsAuth &&
               <AuthButton
-                style={this.props.style.authButton}
                 handleClick={this.handleClickAuthButton}
                 authorizationUrl={this.props.selectedProvider.authorizationUrl}
                 disabled={!!this.props.currentAuthToken.authToken}
@@ -203,8 +206,8 @@ class UploadForm extends React.Component {
           </Grid>
 
           <Grid container spacing={3} align="left">
-            <Grid item xs={12}>
-              <Paper>{rootContainerContent}</Paper>
+            <Grid item xs={12} height={200} className={this.props.classes.resourceTreeContainer}>
+              <Paper>{resourceTree}</Paper>
             </Grid>
           </Grid>
 
@@ -213,13 +216,12 @@ class UploadForm extends React.Component {
               <Button
                 variant="contained"
                 color="primary"
-                style={this.props.style.submit}
+                className={this.props.classes.submit}
                 disabled={this.state.currentUploadEmpty || this.props.currentUpload.isRequesting}
                 onClick={this.handleClickSubmit}
               >Upload</Button>
             </label>
           </Grid>
-
         </Grid>
       </form>
     );
@@ -227,7 +229,7 @@ class UploadForm extends React.Component {
 }
 
 UploadForm.propTypes = {
-  style: PropTypes.object,
+  classes: PropTypes.object.isRequired,
 
   selectedProvider: PropTypes.object.isRequired,
   providers: PropTypes.object.isRequired,
@@ -240,23 +242,20 @@ UploadForm.propTypes = {
   onUpload: PropTypes.func
 };
 
-UploadForm.defaultProps = {
-  style: {
-    selectProvider: {
-      formControl: {
-        display: 'flex',
-        flexWrap: 'wrap'
-      }
-    },
-    grid: {
-      item: {
-        alignSelf: 'center'
-      }
-    },
-    authButton: {
+const styles = {
+  root: {},
+  grid: {
+    item: {
       alignSelf: 'center'
     }
+  },
+  resourceTreeContainer: {
+    overflow: 'scroll',
+    maxHeight: '29.65rem'
+  },
+  resourceTree: {
+    padding: '0.65rem 0.85rem'
   }
-}
+};
 
-export default UploadForm;
+export default withStyles(styles)(UploadForm);

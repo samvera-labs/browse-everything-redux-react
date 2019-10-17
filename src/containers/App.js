@@ -11,7 +11,7 @@ class App extends React.Component {
     return (
       <div className="App">
         <Container maxWidth="lg">
-          <Typography variant="h1" component="h2" gutterBottom>
+          <Typography variant="h3" component="h1" gutterBottom>
             Browse Everything
           </Typography>
         </Container>
