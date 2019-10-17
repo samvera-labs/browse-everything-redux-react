@@ -164,10 +164,10 @@ class UploadForm extends React.Component {
   }
 
   render() {
-    let rootContainerContent;
+    let resourceTree;
 
     if (!this.props.currentUpload.isRequesting && !this.state.rootContainerEmpty) {
-      rootContainerContent = <ResourceTree
+      resourceTree = <ResourceTree
                                root={true}
                                container={this.props.rootContainer.item}
                                dispatch={this.props.dispatch}
@@ -181,11 +181,11 @@ class UploadForm extends React.Component {
         rootContainerText = 'Loading content...';
       }
 
-      rootContainerContent = <Typography className={this.props.classes.rootContainer} variant="body1" component="div">{rootContainerText}</Typography>;
+      resourceTree = <Typography className={this.props.classes.resourceTree} variant="body1" component="div">{rootContainerText}</Typography>;
     }
 
     return (
-      <form className="upload">
+      <form className={this.props.classes.root}>
         <Grid container spacing={3}>
           <Grid item xs={6}>
             <SelectProvider
@@ -206,8 +206,8 @@ class UploadForm extends React.Component {
           </Grid>
 
           <Grid container spacing={3} align="left">
-            <Grid item xs={12}>
-              <Paper>{rootContainerContent}</Paper>
+            <Grid item xs={12} height={200} className={this.props.classes.resourceTreeContainer}>
+              <Paper>{resourceTree}</Paper>
             </Grid>
           </Grid>
 
@@ -222,7 +222,6 @@ class UploadForm extends React.Component {
               >Upload</Button>
             </label>
           </Grid>
-
         </Grid>
       </form>
     );
@@ -250,7 +249,11 @@ const styles = {
       alignSelf: 'center'
     }
   },
-  rootContainer: {
+  resourceTreeContainer: {
+    overflow: 'scroll',
+    maxHeight: '29.65rem'
+  },
+  resourceTree: {
     padding: '0.65rem 0.85rem'
   }
 };
