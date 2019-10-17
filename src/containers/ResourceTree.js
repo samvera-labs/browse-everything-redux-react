@@ -5,6 +5,7 @@ import Checkbox from '@material-ui/core/Checkbox';
 import FolderIcon from '@material-ui/icons/Folder';
 import FolderOpenIcon from '@material-ui/icons/FolderOpen';
 import IconButton from '@material-ui/core/IconButton';
+import { withStyles } from '@material-ui/core/styles';
 
 import {
   getContainer,
@@ -51,7 +52,7 @@ class ResourceTree extends React.Component {
 
   render() {
     return (
-      <div>
+      <div className={this.props.classes.root}>
         <div>
           {!this.props.root && (
             <span>
@@ -83,20 +84,18 @@ class ResourceTree extends React.Component {
 
         <div>
           {this.state.expanded && this.props.container.containers.map(child =>
-            <ResourceTree
+            <StyledChildResourceTree
               key={child.id}
               label={child.name}
               container={child}
               dispatch={this.props.dispatch}
               selected={this.state.selected}
-              styles={this.props.styles}
             />
           )}
           {this.state.expanded && this.props.container.bytestreams.map(child =>
             <ResourceNode
               key={child.id}
               label={child.name}
-              styles={this.props.styles}
               bytestream={child}
               selected={this.state.selected}
               dispatch={this.props.dispatch}
@@ -109,7 +108,7 @@ class ResourceTree extends React.Component {
 }
 
 ResourceTree.propTypes = {
-  styles: PropTypes.object,
+  classes: PropTypes.object.isRequired,
   selected: PropTypes.bool,
   root: PropTypes.bool,
   label: PropTypes.string,
@@ -122,4 +121,15 @@ ResourceTree.defaultProps = {
   root: false
 };
 
-export default ResourceTree;
+const childStyles = {
+  root: {
+    marginLeft: '0.85rem'
+  }
+};
+
+const styles = {
+  root: {}
+};
+
+const StyledChildResourceTree = withStyles(childStyles)(ResourceTree);
+export default withStyles(styles)(ResourceTree);

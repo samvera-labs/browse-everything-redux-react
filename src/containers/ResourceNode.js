@@ -1,8 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+
 import Checkbox from '@material-ui/core/Checkbox';
 import IconButton from '@material-ui/core/IconButton';
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
+import { withStyles } from '@material-ui/core/styles';
+
 import { selectBytestreamForUpload, deselectBytestreamForUpload } from '../actions';
 
 class ResourceNode extends React.Component {
@@ -27,7 +30,7 @@ class ResourceNode extends React.Component {
 
   render() {
     return (
-      <div>
+      <div className={this.props.classes.root}>
         <Checkbox
           checked={this.state.selected}
           onChange={this.handleChecked}
@@ -50,6 +53,7 @@ class ResourceNode extends React.Component {
 }
 
 ResourceNode.propTypes = {
+  classes: PropTypes.object,
   selected: PropTypes.bool,
   label: PropTypes.string.isRequired,
   bytestream: PropTypes.object.isRequired,
@@ -60,4 +64,10 @@ ResourceNode.defaultProps = {
   selected: false
 };
 
-export default ResourceNode;
+const styles = {
+  root: {
+    marginLeft: '0.85rem'
+  }
+};
+
+export default withStyles(styles)(ResourceNode);
