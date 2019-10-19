@@ -19,6 +19,7 @@ import {
   createSession,
   clearSession,
   authorize,
+  createAuthorization,
   createUpload
 } from '../actions';
 
@@ -120,6 +121,9 @@ class UploadForm extends React.Component {
     this.updateCurrentUploadEmpty(currentUploadEmpty);
 
     if (!this.state.currentSessionEmpty && this.props.currentUpload.item.id) {
+      /**
+       * When there is an existing session and an upload has been created
+       */
       const uploadEvent = new CustomEvent('browseEverything.upload', { detail: this.props.currentUpload.item });
       window.dispatchEvent(uploadEvent);
       if (this.props.onUpload) {
@@ -136,16 +140,18 @@ class UploadForm extends React.Component {
       });
       this.props.dispatch(clearSession());
     } else if (!this.state.currentSessionEmpty && this.state.rootContainerEmpty) {
-
-      // If the session is established and there is no root container, request it
-      //   and build the file tree
+      /**
+       * If the session is established and there is no root container, request 
+       * it and build the resource tree
+       */
       if (!this.props.rootContainer.isRequesting) {
         this.props.dispatch(getRootContainer(this.props.currentSession.item, this.props.currentAuthToken.authToken));
       }
     } else if (this.state.currentSessionEmpty && this.props.selectedProvider.id) {
-
-      // If there is no session and a provider has been selected, create a
-      //   session
+      /**
+       * If there is no session and a provider has been selected, create a
+       * session
+       */
       const requestedProvider = this.props.providers.items.find(provider => provider.id === this.props.selectedProvider.id);
       if (!requestedProvider) {
         throw new Error(`Unsupported provider selected: ${this.props.selectedProvider.id}`)
@@ -153,11 +159,18 @@ class UploadForm extends React.Component {
       const providerSupportsAuth = !!requestedProvider.authorizationUrl;
       this.updateProviderSupportsAuth(providerSupportsAuth);
 
-      if (!providerSupportsAuth || this.props.currentAuthToken.authToken) {
+      console.log('HERE');
+      if (this.props.currentAuthToken.authToken) {
         // We only want to request a new session if one is not already being
         // requested
         if (!this.props.currentSession.isRequesting) {
           this.props.dispatch(createSession(this.props.selectedProvider, this.props.currentAuthToken.authToken));
+        }
+      } else if (!providerSupportsAuth) {
+
+        if (!this.props.currentAuthToken.isRequesting) {
+      console.log('HERE3');
+          this.props.dispatch(createAuthorization());
         }
       }
     }
