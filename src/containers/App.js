@@ -1,13 +1,16 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import './App.css';
-import UploadForm from './UploadForm';
-import Typography from '@material-ui/core/Typography';
-import Container from '@material-ui/core/Container';
+import React from 'react'
+import PropTypes from 'prop-types'
+import UploadForm from './UploadForm'
+import Typography from '@material-ui/core/Typography'
+import Container from '@material-ui/core/Container'
 import { connect } from 'react-redux'
+import Paper from '@material-ui/core/Paper'
+import { withStyles } from '@material-ui/core/styles'
 
 class App extends React.Component {
   render() {
+    const { classes } = this.props
+
     return (
       <div className="App">
         <Container maxWidth="lg">
@@ -16,26 +19,28 @@ class App extends React.Component {
           </Typography>
         </Container>
         <Container maxWidth="lg">
-          <UploadForm
-            styles={this.props.style}
-            dispatch={this.props.dispatch}
-            onUpload={this.props.onUpload}
-            selectedProvider={this.props.selectedProvider}
-            currentAuthToken={this.props.currentAuthToken}
-            providers={this.props.providers}
-            currentSession={this.props.currentSession}
-            rootContainer={this.props.rootContainer}
-            currentUpload={this.props.currentUpload}
-          />
+          <Paper className={classes.root}>
+            <UploadForm
+              styles={this.props.style}
+              dispatch={this.props.dispatch}
+              onUpload={this.props.onUpload}
+              selectedProvider={this.props.selectedProvider}
+              currentAuthToken={this.props.currentAuthToken}
+              providers={this.props.providers}
+              currentSession={this.props.currentSession}
+              rootContainer={this.props.rootContainer}
+              currentUpload={this.props.currentUpload}
+            />
+          </Paper>
         </Container>
       </div>
-    );
+    )
   }
 }
 
 App.propTypes = {
   style: PropTypes.object,
-
+  classes: PropTypes.object,
   selectedProvider: PropTypes.object.isRequired, // This should be updated to currentProvider
   providers: PropTypes.object.isRequired,
   currentAuthToken: PropTypes.object.isRequired,
@@ -45,7 +50,7 @@ App.propTypes = {
 
   dispatch: PropTypes.func.isRequired,
   onUpload: PropTypes.func
-};
+}
 
 function mapStateToProps(state) {
   const { selectedProvider } = state
@@ -83,4 +88,11 @@ function mapStateToProps(state) {
   }
 }
 
-export default connect(mapStateToProps)(App);
+const styles = {
+  root: {
+    padding: '30px'
+  }
+}
+const AppWithStyles = withStyles(styles)(App)
+
+export default connect(mapStateToProps)(AppWithStyles)
