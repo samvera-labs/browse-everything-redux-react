@@ -15,6 +15,7 @@ import ResourceTree from './ResourceTree';
 import {
   selectProvider,
   updateProviders,
+  clearProvider,
   getRootContainer,
   createSession,
   clearSession,
@@ -159,7 +160,6 @@ class UploadForm extends React.Component {
       const providerSupportsAuth = !!requestedProvider.authorizationUrl;
       this.updateProviderSupportsAuth(providerSupportsAuth);
 
-      console.log('HERE');
       if (this.props.currentAuthToken.authToken) {
         // We only want to request a new session if one is not already being
         // requested
@@ -167,9 +167,7 @@ class UploadForm extends React.Component {
           this.props.dispatch(createSession(this.props.selectedProvider, this.props.currentAuthToken.authToken));
         }
       } else if (!providerSupportsAuth) {
-
         if (!this.props.currentAuthToken.isRequesting) {
-      console.log('HERE3');
           this.props.dispatch(createAuthorization());
         }
       }
