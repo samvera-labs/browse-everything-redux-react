@@ -48,7 +48,11 @@ App.propTypes = {
 };
 
 function mapStateToProps(state) {
-  const { selectedProvider, currentAuthToken } = state
+  const { selectedProvider } = state
+  const currentAuthToken = state.currentAuthToken || {
+    isRequesting: false,
+    authToken: null
+  }
   const providers = state.providers || {
     isRequesting: false,
     items: []

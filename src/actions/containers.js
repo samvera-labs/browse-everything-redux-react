@@ -126,11 +126,13 @@ function requestAndReceiveContainer(session, authToken, rootContainer, container
   return dispatch => {
     dispatch(requestContainer());
 
-    // I am tired and this does not work - perhaps the errors are being
-    // swallowed for some unholy reason
+    // Errors are being swallowed by redux-bees here, and this needs to be
+    // diagnosed
     // return api.getContainer({ sessionId: session.id, token: authToken, id: container.id }).then(response => {
     const endpoint = config.baseUrl;
-    const request = fetch(`${endpoint}/sessions/${session.id}/containers/${container.id}?token=${authToken}`, {
+    let containerId = container.id.replace(/\./g, '&#x0002E;');
+    containerId = encodeURIComponent(containerId);
+    const request = fetch(`${endpoint}/sessions/${session.id}/containers/${containerId}?token=${authToken}`, {
       headers: {
         'Accepts': 'application/vnd.api+json'
       }

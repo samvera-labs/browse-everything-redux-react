@@ -1,6 +1,6 @@
-import { selectProvider, updateProviders } from './actions/providers';
+import { selectProvider, updateProviders, clearProvider } from './actions/providers';
 import { createSession, clearSession } from './actions/sessions';
-import { authorize } from './actions/authorizations';
+import { authorize, createAuthorization } from './actions/authorizations';
 import { getRootContainer, getContainer } from './actions/containers';
 import {
   createUpload,
@@ -14,9 +14,11 @@ import {
 export {
   selectProvider,
   updateProviders,
+  clearProvider,
   createSession,
   clearSession,
   authorize,
+  createAuthorization,
   getRootContainer,
   getContainer,
   createUpload,
