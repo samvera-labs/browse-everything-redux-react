@@ -42,7 +42,6 @@ export function createAuthorization() {
     const requestUrl = `${endpoint}/providers/${provider.id}/authorize`;
     const request = fetch(requestUrl);
 
-    console.log('HERE4');
     return request.then(response => {
       const jsonResponse = response.json();
       return jsonResponse.then(json => {

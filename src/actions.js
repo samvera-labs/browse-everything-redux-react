@@ -1,4 +1,4 @@
-import { selectProvider, updateProviders } from './actions/providers';
+import { selectProvider, updateProviders, clearProvider } from './actions/providers';
 import { createSession, clearSession } from './actions/sessions';
 import { authorize, createAuthorization } from './actions/authorizations';
 import { getRootContainer, getContainer } from './actions/containers';
@@ -14,6 +14,7 @@ import {
 export {
   selectProvider,
   updateProviders,
+  clearProvider,
   createSession,
   clearSession,
   authorize,

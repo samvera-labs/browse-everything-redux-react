@@ -1,6 +1,12 @@
 import { api } from '../bees';
 import * as types from '../types';
 
+export function clearProvider() {
+  return {
+    type: types.CLEAR_UPLOAD
+  };
+}
+
 /**
  * Define the actions for updating the Redux state
  */
