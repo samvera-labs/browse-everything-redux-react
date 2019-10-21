@@ -52,6 +52,8 @@
   "devDependencies": {
     "babel-loader": "^8.0.6",
     "cross-fetch": "^3.0.4",
+    "enzyme": "^3.10.0",
+    "enzyme-adapter-react-16": "^1.15.1",
     "eslint": "^6.4.0",
     "eslint-config-prettier": "^6.3.0",
     "eslint-loader": "^3.0.0",
