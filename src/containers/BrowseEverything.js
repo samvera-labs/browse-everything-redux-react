@@ -9,14 +9,14 @@ const store = configureStore()
  * Example of handler for updating the DOM once an upload has completed
  */
 const handleUpload = function(event) {
-  console.log(event);
+  console.log(event)
 }
 
 export default class BrowseEverything extends Component {
   render() {
     return (
       <Provider store={store}>
-        <App onUpload={handleUpload}/>
+        <App onUpload={handleUpload} />
       </Provider>
     )
   }
