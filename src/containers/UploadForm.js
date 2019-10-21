@@ -31,7 +31,7 @@ class UploadForm extends React.Component {
     currentSessionEmpty: true,
     rootContainerEmpty: true,
     currentUploadEmpty: true
-  }
+  };
 
   constructor(props) {
     super(props);
@@ -47,7 +47,9 @@ class UploadForm extends React.Component {
    */
   handleChangeProvider(event) {
     const providerId = event.target.value;
-    const provider = this.props.providers.items.find(provider => provider.id === providerId);
+    const provider = this.props.providers.items.find(
+      provider => provider.id === providerId
+    );
     this.props.dispatch(selectProvider(provider));
   }
 
@@ -79,20 +81,20 @@ class UploadForm extends React.Component {
 
   updateCurrentSessionEmpty(currentSessionEmpty) {
     if (this.state.currentSessionEmpty !== currentSessionEmpty) {
-      this.setState({currentSessionEmpty: currentSessionEmpty});
+      this.setState({ currentSessionEmpty: currentSessionEmpty });
     }
   }
 
   updateRootContainerEmpty(rootContainerEmpty) {
     // Request the root container if the Session is already established
     if (this.state.rootContainerEmpty !== rootContainerEmpty) {
-      this.setState({rootContainerEmpty: rootContainerEmpty});
+      this.setState({ rootContainerEmpty: rootContainerEmpty });
     }
   }
 
   updateCurrentUploadEmpty(currentUploadEmpty) {
     if (this.state.currentUploadEmpty !== currentUploadEmpty) {
-      this.setState({currentUploadEmpty: currentUploadEmpty});
+      this.setState({ currentUploadEmpty: currentUploadEmpty });
     }
   }
 
@@ -112,20 +114,26 @@ class UploadForm extends React.Component {
    * This is also likely where the performance issues are arising
    */
   componentDidUpdate() {
-    const currentSessionEmpty = Object.keys(this.props.currentSession.item).length === 0;
+    const currentSessionEmpty =
+      Object.keys(this.props.currentSession.item).length === 0;
     this.updateCurrentSessionEmpty(currentSessionEmpty);
 
-    const rootContainerEmpty = Object.keys(this.props.rootContainer.item).length === 0;
+    const rootContainerEmpty =
+      Object.keys(this.props.rootContainer.item).length === 0;
     this.updateRootContainerEmpty(rootContainerEmpty);
 
-    const currentUploadEmpty = this.props.currentUpload.item.containers.length === 0 && this.props.currentUpload.item.bytestreams.length === 0;
+    const currentUploadEmpty =
+      this.props.currentUpload.item.containers.length === 0 &&
+      this.props.currentUpload.item.bytestreams.length === 0;
     this.updateCurrentUploadEmpty(currentUploadEmpty);
 
     if (!this.state.currentSessionEmpty && this.props.currentUpload.item.id) {
       /**
        * When there is an existing session and an upload has been created
        */
-      const uploadEvent = new CustomEvent('browseEverything.upload', { detail: this.props.currentUpload.item });
+      const uploadEvent = new CustomEvent('browseEverything.upload', {
+        detail: this.props.currentUpload.item
+      });
       window.dispatchEvent(uploadEvent);
       if (this.props.onUpload) {
         this.props.onUpload.call(this, uploadEvent);
@@ -140,22 +148,37 @@ class UploadForm extends React.Component {
         currentUploadEmpty: true
       });
       this.props.dispatch(clearSession());
-    } else if (!this.state.currentSessionEmpty && this.state.rootContainerEmpty) {
+    } else if (
+      !this.state.currentSessionEmpty &&
+      this.state.rootContainerEmpty
+    ) {
       /**
-       * If the session is established and there is no root container, request 
+       * If the session is established and there is no root container, request
        * it and build the resource tree
        */
       if (!this.props.rootContainer.isRequesting) {
-        this.props.dispatch(getRootContainer(this.props.currentSession.item, this.props.currentAuthToken.authToken));
+        this.props.dispatch(
+          getRootContainer(
+            this.props.currentSession.item,
+            this.props.currentAuthToken.authToken
+          )
+        );
       }
-    } else if (this.state.currentSessionEmpty && this.props.selectedProvider.id) {
+    } else if (
+      this.state.currentSessionEmpty &&
+      this.props.selectedProvider.id
+    ) {
       /**
        * If there is no session and a provider has been selected, create a
        * session
        */
-      const requestedProvider = this.props.providers.items.find(provider => provider.id === this.props.selectedProvider.id);
+      const requestedProvider = this.props.providers.items.find(
+        provider => provider.id === this.props.selectedProvider.id
+      );
       if (!requestedProvider) {
-        throw new Error(`Unsupported provider selected: ${this.props.selectedProvider.id}`)
+        throw new Error(
+          `Unsupported provider selected: ${this.props.selectedProvider.id}`
+        );
       }
       const providerSupportsAuth = !!requestedProvider.authorizationUrl;
       this.updateProviderSupportsAuth(providerSupportsAuth);
@@ -164,7 +187,12 @@ class UploadForm extends React.Component {
         // We only want to request a new session if one is not already being
         // requested
         if (!this.props.currentSession.isRequesting) {
-          this.props.dispatch(createSession(this.props.selectedProvider, this.props.currentAuthToken.authToken));
+          this.props.dispatch(
+            createSession(
+              this.props.selectedProvider,
+              this.props.currentAuthToken.authToken
+            )
+          );
         }
       } else if (!providerSupportsAuth) {
         if (!this.props.currentAuthToken.isRequesting) {
@@ -177,12 +205,17 @@ class UploadForm extends React.Component {
   render() {
     let resourceTree;
 
-    if (!this.props.currentUpload.isRequesting && !this.state.rootContainerEmpty) {
-      resourceTree = <ResourceTree
-                               root={true}
-                               container={this.props.rootContainer.item}
-                               dispatch={this.props.dispatch}
-                             />;
+    if (
+      !this.props.currentUpload.isRequesting &&
+      !this.state.rootContainerEmpty
+    ) {
+      resourceTree = (
+        <ResourceTree
+          root={true}
+          container={this.props.rootContainer.item}
+          dispatch={this.props.dispatch}
+        />
+      );
     } else {
       let rootContainerText = 'Please select a provider';
 
@@ -192,7 +225,15 @@ class UploadForm extends React.Component {
         rootContainerText = 'Loading content...';
       }
 
-      resourceTree = <Typography className={this.props.classes.resourceTree} variant="body1" component="div">{rootContainerText}</Typography>;
+      resourceTree = (
+        <Typography
+          className={this.props.classes.resourceTree}
+          variant="body1"
+          component="div"
+        >
+          {rootContainerText}
+        </Typography>
+      );
     }
 
     return (
@@ -200,25 +241,30 @@ class UploadForm extends React.Component {
         <Grid container spacing={3}>
           <Grid item xs={6}>
             <SelectProvider
-                handleChange={this.handleChangeProvider}
-                selectedProvider={this.props.selectedProvider}
-                providers={this.props.providers}
+              handleChange={this.handleChangeProvider}
+              selectedProvider={this.props.selectedProvider}
+              providers={this.props.providers}
             />
           </Grid>
 
           <Grid item xs={6} className={this.props.classes.grid.item}>
-            {this.state.providerSupportsAuth &&
+            {this.state.providerSupportsAuth && (
               <AuthButton
                 handleClick={this.handleClickAuthButton}
                 authorizationUrl={this.props.selectedProvider.authorizationUrl}
                 disabled={!!this.props.currentAuthToken.authToken}
               />
-            }
+            )}
           </Grid>
 
           <Grid container spacing={3} align="left">
-            <Grid item xs={12} height={200} className={this.props.classes.resourceTreeContainer}>
-              <Paper>{resourceTree}</Paper>
+            <Grid
+              item
+              xs={12}
+              height={200}
+              className={this.props.classes.resourceTreeContainer}
+            >
+              <div>{resourceTree}</div>
             </Grid>
           </Grid>
 
@@ -228,9 +274,14 @@ class UploadForm extends React.Component {
                 variant="contained"
                 color="primary"
                 className={this.props.classes.submit}
-                disabled={this.state.currentUploadEmpty || this.props.currentUpload.isRequesting}
+                disabled={
+                  this.state.currentUploadEmpty ||
+                  this.props.currentUpload.isRequesting
+                }
                 onClick={this.handleClickSubmit}
-              >Upload</Button>
+              >
+                Upload
+              </Button>
             </label>
           </Grid>
         </Grid>
