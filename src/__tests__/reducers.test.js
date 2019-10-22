@@ -1,5 +1,5 @@
-import reducer from '../reducers'
-import * as types from '../actions'
+import reducer from '../reducers';
+import * as types from '../actions';
 
 describe('the reducer', () => {
   it('should return the initial state', () => {
@@ -12,20 +12,18 @@ describe('the reducer', () => {
           items: []
         }
       }
-    }
+    };
 
-    expect(reducer(undefined, {})).toEqual(initialState)
-  })
+    expect(reducer(undefined, {})).toEqual(initialState);
+  });
 
   it('should update the state for a SELECT_PROVIDER action', () => {
-    const provider1 = {
-
-    }
+    const provider1 = {};
 
     let updatedState = reducer([], {
       type: types.SELECT_PROVIDER,
       provider: 'file_system'
-    })
+    });
 
     let expectedState = {
       selectProvider: {},
@@ -36,7 +34,7 @@ describe('the reducer', () => {
           items: [provider1]
         }
       }
-    }
-    expect(updatedState).toEqual(expectedState)
-  })
-})
+    };
+    expect(updatedState).toEqual(expectedState);
+  });
+});
