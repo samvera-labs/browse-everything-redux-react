@@ -45,15 +45,33 @@ function requestRootContainer() {
   };
 }
 
+/**
+ * Generates a cache mapping child container IDs to parent container IDs
+ */
+function buildCache(container) {
+  let cache = {};
+
+  // eslint-disable-next-line no-unused-vars
+  for (const child of container.containers) {
+    cache[child.id] = container;
+    const childCache = buildCache(child);
+    cache = Object.assign({}, cache, childCache);
+  }
+
+  return cache;
+}
+
 function receiveRootContainer(response) {
   const body = response.body;
   const data = body.data;
   const container = buildContainer(data);
+  const cache = buildCache(container);
   return {
     type: types.RECEIVE_ROOT_CONTAINER,
     isRequesting: false,
     item: container,
-    receivedAt: Date.now()
+    receivedAt: Date.now(),
+    cache
   };
 }
 
@@ -102,11 +120,13 @@ function requestContainer() {
   };
 }
 
-function receiveContainer(response, rootContainer) {
+function receiveContainer(response, parentContainer, cache) {
   // This approach is used here because now Bees no longer works :(
   const data = response.data;
 
   const container = buildContainer(data);
+  const containerCache = buildCache(container);
+  const updatedCache = Object.assign({}, cache, containerCache);
 
   // This is the action, it is *not* mapped directly to the state
   // Instead, the reducer uses this data in order to modify the rootContainer
@@ -115,14 +135,15 @@ function receiveContainer(response, rootContainer) {
     type: types.RECEIVE_CONTAINER,
     isRequesting: false,
     item: container,
-    receivedAt: Date.now()
+    receivedAt: Date.now(),
+    cache: updatedCache
   };
 }
 /**
  * Retrieving the container requires that the root container be passed for the
  * ID in order to construct the query for the container
  */
-function requestAndReceiveContainer(session, authToken, rootContainer, container) {
+function requestAndReceiveContainer(session, authToken, container, cache) {
   return dispatch => {
     dispatch(requestContainer());
 
@@ -141,7 +162,7 @@ function requestAndReceiveContainer(session, authToken, rootContainer, container
     return request.then(response => {
       const jsonResponse = response.json();
       return jsonResponse.then(json => {
-        return dispatch(receiveContainer(json, rootContainer));
+        return dispatch(receiveContainer(json, container, cache));
       });
     },
     error => {
@@ -155,7 +176,7 @@ export function getContainer(container) {
     const state = getState();
     const session = state.currentSession.item;
     const authToken = state.currentAuthToken.authToken;
-    const rootContainer = state.rootContainer.item;
-    return dispatch(requestAndReceiveContainer(session, authToken, rootContainer, container));
+    const cache = state.rootContainer.cache;
+    return dispatch(requestAndReceiveContainer(session, authToken, container, cache));
   }
 }

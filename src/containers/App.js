@@ -68,7 +68,8 @@ function mapStateToProps(state) {
   }
   const rootContainer = state.rootContainer || {
     isRequesting: false,
-    item: {}
+    item: {},
+    cache: {}
   }
   const currentUpload = state.currentUpload || {
     isRequesting: false,
