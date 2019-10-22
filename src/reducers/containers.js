@@ -1,12 +1,26 @@
 import * as types from '../types';
 
-function updateRootContainer(rootContainer, container) {
+function findChildOfParent(descendant, rootId, cache) {
+  const nextParent = cache[descendant.id];
+  if (nextParent.id === rootId) {
+    return descendant;
+  }
 
-  // This should be possible, but requires that the rootContainer.containers
-  // property be restructured from an Array to and Object
-  // rootContainer.containers[container.id] = container;
-  const containerIdx = rootContainer.containers.findIndex(child => child.id === container.id);
-  rootContainer.containers[containerIdx] = container;
+  const childIdx = nextParent.containers.findIndex(child => child.id === descendant.id);
+  nextParent.containers[childIdx] = descendant;
+
+  return findChildOfParent(nextParent, rootId, cache);
+}
+
+function updateRootContainer(rootContainer, cache, container) {
+  /**
+   * This fails when the container being updated is not a child (but a
+   * descendent) of the root container
+   */
+  const child = findChildOfParent(container, rootContainer.id, cache);
+  const containerIdx = rootContainer.containers.findIndex(node => node.id === child.id);
+  rootContainer.containers[containerIdx] = child;
+
   return Object.assign({}, rootContainer);
 }
 
@@ -20,20 +34,20 @@ function updatedRootContainerState(state = {}, action) {
       return Object.assign({}, state, {
         isRequesting: false,
         item: action.item,
-        lastUpdated: action.receivedAt
+        lastUpdated: action.receivedAt,
+        cache: action.cache
       });
     case types.REQUEST_CONTAINER:
       return Object.assign({}, state, {
         isRequesting: true
       });
     case types.RECEIVE_CONTAINER:
-      // This needs to be removed and a new Action added
-      const updatedRootContainer = updateRootContainer(state.item, action.item);
-
+      const updatedRootContainer = updateRootContainer(state.item, action.cache, action.item);
       return Object.assign({}, state, {
         isRequesting: false,
         item: updatedRootContainer,
-        lastUpdated: action.receivedAt
+        lastUpdated: action.receivedAt,
+        cache: action.cache
       });
     default:
       return state;

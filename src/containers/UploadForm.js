@@ -15,7 +15,6 @@ import ResourceTree from './ResourceTree';
 import {
   selectProvider,
   updateProviders,
-  clearProvider,
   getRootContainer,
   createSession,
   clearSession,
