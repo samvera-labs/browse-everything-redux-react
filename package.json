@@ -3,18 +3,39 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@material-ui/core": "^4.4.2",
+    "@material-ui/icons": "^4.4.3",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
-    "react-scripts": "3.1.1"
+    "react-scripts": "3.1.1",
+    "redux": "^4.0.4",
+    "redux-bees": "^0.1.11",
+    "redux-thunk": "^2.3.0"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "test:coverage": "react-scripts test --coverage --watchAll=false",
+    "eject": "react-scripts eject",
+    "lint": "eslint './src/**/*.{js,jsx}'",
+    "lint:fix": "eslint --fix './src/**/*.{js,jsx}'"
   },
   "eslintConfig": {
     "extends": "react-app"
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx}"
+    ],
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "src/serviceWorker.js",
+      "src/configureStore.js",
+      "src/bees.js",
+      "src/index.js",
+      "src/tests/*.{js,jsx}"
+    ]
   },
   "browserslist": {
     "production": [
@@ -27,5 +48,22 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "babel-loader": "^8.0.6",
+    "cross-fetch": "^3.0.4",
+    "enzyme": "^3.10.0",
+    "enzyme-adapter-react-16": "^1.15.1",
+    "eslint": "^6.4.0",
+    "eslint-config-prettier": "^6.3.0",
+    "eslint-loader": "^3.0.0",
+    "eslint-plugin-prettier": "^3.1.1",
+    "eslint-plugin-react": "^7.14.3",
+    "fetch-mock": "^7.3.9",
+    "node-fetch": "^2.6.0",
+    "prettier": "^1.18.2",
+    "redux-logger": "^3.0.6",
+    "redux-mock-store": "^1.5.3",
+    "timekeeper": "^2.2.0"
   }
 }
