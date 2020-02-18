@@ -1,17 +1,16 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from 'react'
+import PropTypes from 'prop-types'
 
-import './UploadForm.css';
+import './UploadForm.css'
 
-import Button from '@material-ui/core/Button';
-import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
-import Typography from '@material-ui/core/Typography';
-import { withStyles } from '@material-ui/core/styles';
+import Button from '@material-ui/core/Button'
+import Grid from '@material-ui/core/Grid'
+import Typography from '@material-ui/core/Typography'
+import { withStyles } from '@material-ui/core/styles'
 
-import SelectProvider from './SelectProvider';
-import AuthButton from './AuthButton';
-import ResourceTree from './ResourceTree';
+import SelectProvider from './SelectProvider'
+import AuthButton from './AuthButton'
+import ResourceTree from './ResourceTree'
 import {
   selectProvider,
   updateProviders,
@@ -21,7 +20,7 @@ import {
   authorize,
   createAuthorization,
   createUpload
-} from '../actions';
+} from '../actions'
 
 class UploadForm extends React.Component {
   // This should be refactored
@@ -30,26 +29,26 @@ class UploadForm extends React.Component {
     currentSessionEmpty: true,
     rootContainerEmpty: true,
     currentUploadEmpty: true
-  };
+  }
 
   constructor(props) {
-    super(props);
-    this.handleChangeProvider = this.handleChangeProvider.bind(this);
-    this.handleClickAuthButton = this.handleClickAuthButton.bind(this);
-    this.handleAuthorize = this.handleAuthorize.bind(this);
+    super(props)
+    this.handleChangeProvider = this.handleChangeProvider.bind(this)
+    this.handleClickAuthButton = this.handleClickAuthButton.bind(this)
+    this.handleAuthorize = this.handleAuthorize.bind(this)
     /** @todo Investigate why <form onSubmit> isn't being dispatched */
-    this.handleClickSubmit = this.handleClickSubmit.bind(this);
+    this.handleClickSubmit = this.handleClickSubmit.bind(this)
   }
 
   /**
    * This changes the provider when users select from the dropdown
    */
   handleChangeProvider(event) {
-    const providerId = event.target.value;
+    const providerId = event.target.value
     const provider = this.props.providers.items.find(
       provider => provider.id === providerId
-    );
-    this.props.dispatch(selectProvider(provider));
+    )
+    this.props.dispatch(selectProvider(provider))
   }
 
   /**
@@ -57,43 +56,43 @@ class UploadForm extends React.Component {
    */
   handleClickAuthButton(event) {
     // This opens the new window for the OAuth
-    event.preventDefault();
-    window.open(this.props.selectedProvider.authorizationUrl);
+    event.preventDefault()
+    window.open(this.props.selectedProvider.authorizationUrl)
   }
 
   handleAuthorize(event) {
     // Update the state with the authorization
     if (event.data && event.data.authToken) {
-      this.props.dispatch(authorize(event.data.authToken));
+      this.props.dispatch(authorize(event.data.authToken))
     }
   }
 
   handleClickSubmit() {
-    this.props.dispatch(createUpload(this.props.currentAuthToken.authToken));
+    this.props.dispatch(createUpload(this.props.currentAuthToken.authToken))
   }
 
   componentDidMount() {
     // Once the component mounts the DOM, retrieve all Providers from the API
-    this.props.dispatch(updateProviders());
-    window.addEventListener('message', this.handleAuthorize);
+    this.props.dispatch(updateProviders())
+    window.addEventListener('message', this.handleAuthorize)
   }
 
   updateCurrentSessionEmpty(currentSessionEmpty) {
     if (this.state.currentSessionEmpty !== currentSessionEmpty) {
-      this.setState({ currentSessionEmpty: currentSessionEmpty });
+      this.setState({ currentSessionEmpty: currentSessionEmpty })
     }
   }
 
   updateRootContainerEmpty(rootContainerEmpty) {
     // Request the root container if the Session is already established
     if (this.state.rootContainerEmpty !== rootContainerEmpty) {
-      this.setState({ rootContainerEmpty: rootContainerEmpty });
+      this.setState({ rootContainerEmpty: rootContainerEmpty })
     }
   }
 
   updateCurrentUploadEmpty(currentUploadEmpty) {
     if (this.state.currentUploadEmpty !== currentUploadEmpty) {
-      this.setState({ currentUploadEmpty: currentUploadEmpty });
+      this.setState({ currentUploadEmpty: currentUploadEmpty })
     }
   }
 
@@ -101,7 +100,7 @@ class UploadForm extends React.Component {
     // Update the state when a provider has been selected which supports/does
     // not support authentication
     if (providerSupportsAuth !== this.state.providerSupportsAuth) {
-      this.setState({ providerSupportsAuth: providerSupportsAuth });
+      this.setState({ providerSupportsAuth: providerSupportsAuth })
     }
   }
 
@@ -114,17 +113,17 @@ class UploadForm extends React.Component {
    */
   componentDidUpdate() {
     const currentSessionEmpty =
-      Object.keys(this.props.currentSession.item).length === 0;
-    this.updateCurrentSessionEmpty(currentSessionEmpty);
+      Object.keys(this.props.currentSession.item).length === 0
+    this.updateCurrentSessionEmpty(currentSessionEmpty)
 
     const rootContainerEmpty =
-      Object.keys(this.props.rootContainer.item).length === 0;
-    this.updateRootContainerEmpty(rootContainerEmpty);
+      Object.keys(this.props.rootContainer.item).length === 0
+    this.updateRootContainerEmpty(rootContainerEmpty)
 
     const currentUploadEmpty =
       this.props.currentUpload.item.containers.length === 0 &&
-      this.props.currentUpload.item.bytestreams.length === 0;
-    this.updateCurrentUploadEmpty(currentUploadEmpty);
+      this.props.currentUpload.item.bytestreams.length === 0
+    this.updateCurrentUploadEmpty(currentUploadEmpty)
 
     if (!this.state.currentSessionEmpty && this.props.currentUpload.item.id) {
       /**
@@ -132,10 +131,10 @@ class UploadForm extends React.Component {
        */
       const uploadEvent = new CustomEvent('browseEverything.upload', {
         detail: this.props.currentUpload.item
-      });
-      window.dispatchEvent(uploadEvent);
+      })
+      window.dispatchEvent(uploadEvent)
       if (this.props.onUpload) {
-        this.props.onUpload.call(this, uploadEvent);
+        this.props.onUpload.call(this, uploadEvent)
       }
 
       // Reinitializing the state does not re-render the components
@@ -145,8 +144,8 @@ class UploadForm extends React.Component {
         currentSessionEmpty: true,
         rootContainerEmpty: true,
         currentUploadEmpty: true
-      });
-      this.props.dispatch(clearSession());
+      })
+      this.props.dispatch(clearSession())
     } else if (
       !this.state.currentSessionEmpty &&
       this.state.rootContainerEmpty
@@ -161,7 +160,7 @@ class UploadForm extends React.Component {
             this.props.currentSession.item,
             this.props.currentAuthToken.authToken
           )
-        );
+        )
       }
     } else if (
       this.state.currentSessionEmpty &&
@@ -173,14 +172,14 @@ class UploadForm extends React.Component {
        */
       const requestedProvider = this.props.providers.items.find(
         provider => provider.id === this.props.selectedProvider.id
-      );
+      )
       if (!requestedProvider) {
         throw new Error(
           `Unsupported provider selected: ${this.props.selectedProvider.id}`
-        );
+        )
       }
-      const providerSupportsAuth = !!requestedProvider.authorizationUrl;
-      this.updateProviderSupportsAuth(providerSupportsAuth);
+      const providerSupportsAuth = !!requestedProvider.authorizationUrl
+      this.updateProviderSupportsAuth(providerSupportsAuth)
 
       if (this.props.currentAuthToken.authToken) {
         // We only want to request a new session if one is not already being
@@ -191,18 +190,18 @@ class UploadForm extends React.Component {
               this.props.selectedProvider,
               this.props.currentAuthToken.authToken
             )
-          );
+          )
         }
       } else if (!providerSupportsAuth) {
         if (!this.props.currentAuthToken.isRequesting) {
-          this.props.dispatch(createAuthorization());
+          this.props.dispatch(createAuthorization())
         }
       }
     }
   }
 
   render() {
-    let resourceTree;
+    let resourceTree
 
     if (
       !this.props.currentUpload.isRequesting &&
@@ -214,14 +213,14 @@ class UploadForm extends React.Component {
           container={this.props.rootContainer.item}
           dispatch={this.props.dispatch}
         />
-      );
+      )
     } else {
-      let rootContainerText = 'Please select a provider';
+      let rootContainerText = 'Please select a provider'
 
       if (this.props.currentUpload.isRequesting) {
-        rootContainerText = 'Uploading files...';
+        rootContainerText = 'Uploading files...'
       } else if (!!this.props.currentAuthToken.authToken) {
-        rootContainerText = 'Loading content...';
+        rootContainerText = 'Loading content...'
       }
 
       resourceTree = (
@@ -232,11 +231,11 @@ class UploadForm extends React.Component {
         >
           {rootContainerText}
         </Typography>
-      );
+      )
     }
 
     return (
-      <form className={this.props.classes.root}>
+      <form className={this.props.classes.root} data-testid="upload-form">
         <Grid container spacing={3}>
           <Grid item xs={6}>
             <SelectProvider
@@ -263,13 +262,14 @@ class UploadForm extends React.Component {
               height={200}
               className={this.props.classes.resourceTreeContainer}
             >
-              <div>{resourceTree}</div>
+              <div data-testid="resource-tree-wrapper">{resourceTree}</div>
             </Grid>
           </Grid>
 
           <Grid item xs={12} align="left">
             <label htmlFor="upload-form-submit">
               <Button
+                data-testid="upload-submit-button"
                 variant="contained"
                 color="primary"
                 className={this.props.classes.submit}
@@ -285,7 +285,7 @@ class UploadForm extends React.Component {
           </Grid>
         </Grid>
       </form>
-    );
+    )
   }
 }
 
@@ -301,7 +301,7 @@ UploadForm.propTypes = {
 
   dispatch: PropTypes.func.isRequired,
   onUpload: PropTypes.func
-};
+}
 
 const styles = {
   root: {},
@@ -317,6 +317,6 @@ const styles = {
   resourceTree: {
     padding: '0.65rem 0.85rem'
   }
-};
+}
 
-export default withStyles(styles)(UploadForm);
+export default withStyles(styles)(UploadForm)

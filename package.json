@@ -15,7 +15,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "react-scripts test --testPathIgnorePatterns=src/__tests__/testing-helpers.js  --env=jsdom",
     "test:coverage": "react-scripts test --coverage --watchAll=false",
     "eject": "react-scripts eject",
     "lint": "eslint './src/**/*.{js,jsx}'",
@@ -23,19 +23,6 @@
   },
   "eslintConfig": {
     "extends": "react-app"
-  },
-  "jest": {
-    "collectCoverageFrom": [
-      "src/**/*.{js,jsx}"
-    ],
-    "coveragePathIgnorePatterns": [
-      "/node_modules/",
-      "src/serviceWorker.js",
-      "src/configureStore.js",
-      "src/bees.js",
-      "src/index.js",
-      "src/tests/*.{js,jsx}"
-    ]
   },
   "browserslist": {
     "production": [
@@ -50,6 +37,8 @@
     ]
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^5.1.1",
+    "@testing-library/react": "^9.4.0",
     "babel-loader": "^8.0.6",
     "cross-fetch": "^3.0.4",
     "eslint": "^6.4.0",

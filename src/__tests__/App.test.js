@@ -1,10 +1,7 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
 import App from '../containers/App'
+import { renderWithRedux } from './testing-helpers'
 
-/**
- * This needs to be implemented to handle working with the Redux Store
- */
-it('renders the component on the DOM', () => {
-  // To be implemented
+it('renders without crashing', () => {
+  expect(renderWithRedux(<App />))
 })

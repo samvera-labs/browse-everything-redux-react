@@ -1,12 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-
 import Checkbox from '@material-ui/core/Checkbox'
 import FolderIcon from '@material-ui/icons/Folder'
 import FolderOpenIcon from '@material-ui/icons/FolderOpen'
 import IconButton from '@material-ui/core/IconButton'
 import { withStyles } from '@material-ui/core/styles'
-
 import {
   getContainer,
   selectContainerForUpload,
@@ -52,11 +50,15 @@ class ResourceTree extends React.Component {
 
   render() {
     return (
-      <div className={this.props.classes.root}>
+      <div
+        className={this.props.classes.root}
+        data-testid="resource-tree-wrapper"
+      >
         <div>
           {!this.props.root && (
             <span>
               <Checkbox
+                data-testid="primary-checkbox"
                 checked={this.state.selected}
                 onChange={this.handleChecked}
                 value="selected"
@@ -65,6 +67,7 @@ class ResourceTree extends React.Component {
                 }}
               />
               <IconButton
+                data-testid="expand-collapse-button"
                 aria-label="expand or collapse"
                 size="small"
                 onClick={

@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-
 import Checkbox from '@material-ui/core/Checkbox'
 import IconButton from '@material-ui/core/IconButton'
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile'
@@ -35,6 +34,7 @@ class ResourceNode extends React.Component {
     return (
       <div className={this.props.classes.root}>
         <Checkbox
+          data-testid="resource-node-checkbox"
           checked={this.state.selected}
           onChange={this.handleChecked}
           value="selected"
@@ -43,7 +43,11 @@ class ResourceNode extends React.Component {
           }}
         />
 
-        <IconButton aria-label="expand or collapse" size="small">
+        <IconButton
+          data-testid="expand-collapse-button"
+          aria-label="expand or collapse"
+          size="small"
+        >
           <InsertDriveFileIcon />
         </IconButton>
 
