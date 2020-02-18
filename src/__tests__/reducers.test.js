@@ -1,40 +1,32 @@
-import reducer from '../reducers';
-import * as types from '../actions';
+import reducer from '../reducers'
+import * as types from '../actions'
 
 describe('the reducer', () => {
   it('should return the initial state', () => {
     const initialState = {
-      selectProvider: {},
-      updateProviders: {
-        providers: {
-          didInvalidate: false,
-          isFetching: false,
-          items: []
+      selectedProvider: {},
+      providers: {
+        isRequesting: false,
+        items: []
+      },
+      currentSession: {
+        isRequesting: false,
+        item: {}
+      },
+      rootContainer: {
+        item: {},
+        isRequesting: false
+      },
+      currentAuthToken: {},
+      currentUpload: {
+        isRequesting: false,
+        item: {
+          containers: [],
+          bytestreams: []
         }
       }
-    };
-
-    expect(reducer(undefined, {})).toEqual(initialState);
-  });
-
-  it('should update the state for a SELECT_PROVIDER action', () => {
-    const provider1 = {};
-
-    let updatedState = reducer([], {
-      type: types.SELECT_PROVIDER,
-      provider: 'file_system'
-    });
-
-    let expectedState = {
-      selectProvider: {},
-      updateProviders: {
-        providers: {
-          didInvalidate: false,
-          isFetching: false,
-          items: [provider1]
-        }
-      }
-    };
-    expect(updatedState).toEqual(expectedState);
-  });
-});
+    }
+    const response = reducer(undefined, {})
+    expect(response).toEqual(initialState)
+  })
+})
