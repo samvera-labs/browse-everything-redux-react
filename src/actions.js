@@ -1,7 +1,11 @@
-import { selectProvider, updateProviders, clearProvider } from './actions/providers';
-import { createSession, clearSession } from './actions/sessions';
-import { authorize, createAuthorization } from './actions/authorizations';
-import { getRootContainer, getContainer } from './actions/containers';
+import {
+  selectProvider,
+  updateProviders,
+  clearProvider
+} from './actions/providers'
+import { createSession, clearSession } from './actions/sessions'
+import { authorize, createAuthorization } from './actions/authorizations'
+import { getRootContainer, getContainer } from './actions/containers'
 import {
   createUpload,
   selectContainerForUpload,
@@ -9,7 +13,7 @@ import {
   selectBytestreamForUpload,
   deselectBytestreamForUpload,
   clearUpload
-} from './actions/uploads';
+} from './actions/uploads'
 
 export {
   selectProvider,
@@ -27,4 +31,4 @@ export {
   selectBytestreamForUpload,
   deselectBytestreamForUpload,
   clearUpload
-};
+}
