@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import { Provider } from 'react-redux'
 import configureStore from '../configureStore'
 import App from './App'
@@ -6,19 +7,22 @@ import './BrowseEverything.css'
 
 const store = configureStore()
 
-/**
- * Example of handler for updating the DOM once an upload has completed
- */
-const handleUpload = function(event) {
-  console.log(event)
-}
-
-export default class BrowseEverything extends Component {
+class BrowseEverything extends Component {
   render() {
     return (
       <Provider store={store}>
-        <App onUpload={handleUpload} />
+        <App
+          onUpload={this.props.handleUpload}
+          title={this.props.title}
+        />
       </Provider>
     )
   }
 }
+
+BrowseEverything.propTypes = {
+  handleUpload: PropTypes.func,
+  title: PropTypes.string
+}
+
+export default BrowseEverything

@@ -54,7 +54,8 @@ describe('actions', () => {
     ]
     const store = mockStore({ providers: [] })
 
-    store.dispatch(actions.updateProviders()).then(() => {
+    const promise = store.dispatch(actions.updateProviders())
+    const fulfilled = promise.then(() => {
       expect(store.getActions()).toEqual(expectedActions)
     })
   })

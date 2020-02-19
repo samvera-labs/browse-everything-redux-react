@@ -55,8 +55,9 @@ SelectProvider.propTypes = {
   providers: PropTypes.shape({
     items: PropTypes.array,
     id: PropTypes.string,
-    name: PropTypes.string
-  }),
+    name: PropTypes.string,
+    isRequesting: PropTypes.bool
+  }).isRequired,
   handleChange: PropTypes.func.isRequired
 }
 
