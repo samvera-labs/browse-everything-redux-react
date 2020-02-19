@@ -1,0 +1,45 @@
+version: 2 # use CircleCI 2.0
+jobs:
+  build:
+    working_directory: ~/be-redux-react
+    docker:
+      - image: circleci/node:12.14.0-browsers
+
+    steps:
+      - checkout
+      # Restore the dependency cache
+      - restore_cache:
+          key: be-redux-react-{{ checksum "package-lock.json" }}
+
+      - run:
+          name: Install dependencies with NPM
+          command: npm install
+      
+      # Save the dependency cache
+      - save_cache:
+          key: be-redux-react-{{ checksum "package-lock.json" }}
+          paths:
+            - "node_modules"
+      # - run: 
+      #     name: Validate the style of the code
+      #     command: yarn lint
+
+      - run:
+          name: Run tests
+          command: |
+            mkdir /tmp/test-results
+            npm test
+
+      # Collect reports
+      - store_artifacts: 
+          path: /tmp/test-results
+
+      - store_test_results:
+          path: /tmp/test-results
+          destination: test-results
+
+workflows:
+  version: 2
+  Build and Test:
+    jobs:
+      - build

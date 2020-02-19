@@ -1,4 +1,4 @@
-# BrowseEverything Redux/React
+# BrowseEverything Redux/
 _A [React](https://reactjs.org/) and [Redux](https://redux.js.org/) user interface implementation for the [BrowseEverything Core Component](https://github.com/samvera/browse-everything)_
 
 Jump in: [![Slack Status](http://slack.samvera.org/badge.svg)](http://slack.samvera.org/)
