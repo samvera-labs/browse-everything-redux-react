@@ -1,6 +1,9 @@
 {
-  "name": "test-redux-react",
-  "version": "0.1.0",
+  "name": "browse-everything-react",
+  "version": "1.0.0",
+  "description": "Browse Everything user interface in React",
+  "license": "Apache-2.0",
+  "homepage" : "https://github.com/samvera-labs/browse-everything-redux-react",
   "private": true,
   "dependencies": {
     "@material-ui/core": "^4.4.2",
