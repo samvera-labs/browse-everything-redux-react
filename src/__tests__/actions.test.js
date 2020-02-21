@@ -1,4 +1,3 @@
-
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 import * as types from '../types'
@@ -32,28 +31,26 @@ describe('actions', () => {
 
   it('dispatches REQUEST_PROVIDERS and RECEIVE_PROVIDERS when providers have been requested and received from the API', () => {
     // These should be loaded from fixture files
-    const provider1 = {
+    const provider1 = {}
 
-    }
-
-    const provider2 = {
-
-    }
+    const provider2 = {}
 
     fetchMock.getOnce('http://localhost:3000/browse/providers', {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
       body: {
-        data: [
-          provider1,
-          provider2
-        ]
+        data: [provider1, provider2]
       }
     })
 
     const expectedActions = [
       { type: types.REQUEST_PROVIDERS, isRequesting: true, providers: [] },
-      { type: types.RECEIVE_PROVIDERS, isRequesting: false, providers: [provider1, provider2], receivedAt: currentTime }
+      {
+        type: types.RECEIVE_PROVIDERS,
+        isRequesting: false,
+        providers: [provider1, provider2],
+        receivedAt: currentTime
+      }
     ]
     const store = mockStore({ providers: [] })
 

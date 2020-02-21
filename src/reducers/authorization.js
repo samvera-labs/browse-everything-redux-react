@@ -1,4 +1,4 @@
-import * as types from '../types';
+import * as types from '../types'
 
 export function authToken(state = {}, action) {
   switch (action.type) {
@@ -10,10 +10,10 @@ export function authToken(state = {}, action) {
         lastUpdated: action.receivedAt,
         isRequesting: action.isRequesting
       }
-      return Object.assign({}, state, updated);
+      return Object.assign({}, state, updated)
     case types.CLEAR_SESSION:
-      return {};
+      return {}
     default:
-      return state;
+      return state
   }
 }

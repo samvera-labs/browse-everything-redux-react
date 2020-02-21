@@ -1,0 +1,40 @@
+version: 2 # use CircleCI 2.0
+jobs:
+  build:
+    working_directory: ~/be-redux-react
+    docker:
+      - image: circleci/node:12.14.0-browsers
+
+    steps:
+      - checkout
+      # Restore the dependency cache
+      - restore_cache:
+          keys: 
+            - v1-dependencies-{{ checksum "package-lock.json" }}
+            - v1-dependencies-
+      - run:
+          name: Install dependencies with NPM
+          command: npm install
+    
+      # Save the dependency cache
+      - save_cache:
+          key: v1-dependencies-{{ checksum "package-lock.json" }}
+          paths:
+            - node_modules
+
+      # I kept this commented because it fails
+      # - run: 
+      #     name: Validate the style of the code
+      #     command: yarn lint
+
+      - run:
+          name: "Run Jest and Collect Coverage Reports"
+          command: yarn test --collectCoverage=true
+      - store_artifacts:
+          path: coverage
+
+workflows:
+  version: 2
+  Build and Test:
+    jobs:
+      - build

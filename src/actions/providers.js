@@ -1,10 +1,10 @@
-import { api } from '../bees';
-import * as types from '../types';
+import { api } from '../bees'
+import * as types from '../types'
 
 export function clearProvider() {
   return {
     type: types.CLEAR_UPLOAD
-  };
+  }
 }
 
 /**
@@ -14,7 +14,7 @@ export function selectProvider(provider) {
   return {
     type: types.SELECT_PROVIDER,
     provider
-  };
+  }
 }
 
 /**
@@ -23,8 +23,8 @@ export function selectProvider(provider) {
  * requested from the API
  */
 function shouldRequestProviders(state) {
-  const providers = state.providers;
-  return !providers.isRequesting;
+  const providers = state.providers
+  return !providers.isRequesting
 }
 
 /**
@@ -35,43 +35,43 @@ export function requestProviders() {
     type: types.REQUEST_PROVIDERS,
     providers: [],
     isRequesting: true
-  };
+  }
 }
 
 function buildProviders(data) {
-  const providers = [];
+  const providers = []
 
   // eslint-disable-next-line no-unused-vars
   for (const values of data) {
-    const provider = values.attributes;
+    const provider = values.attributes
 
-    let authorizationUrl;
+    let authorizationUrl
     if (values.links['authorization_url']) {
-      const urlValues = values.links.authorization_url;
-      authorizationUrl = `${urlValues.scheme}://${urlValues.host}${urlValues.path}?${urlValues.query}`;
-      provider.authorizationUrl = authorizationUrl;
+      const urlValues = values.links.authorization_url
+      authorizationUrl = `${urlValues.scheme}://${urlValues.host}${urlValues.path}?${urlValues.query}`
+      provider.authorizationUrl = authorizationUrl
     }
 
-    providers.push(provider);
+    providers.push(provider)
   }
 
-  return providers;
+  return providers
 }
 
 /**
  * Receiving all of the providers from the API
  */
 export function receiveProviders(response) {
-  const body = response.body;
-  const data = body.data;
-  const providers = buildProviders(data);
+  const body = response.body
+  const data = body.data
+  const providers = buildProviders(data)
 
   return {
     type: types.RECEIVE_PROVIDERS,
     isRequesting: false,
     receivedAt: Date.now(),
     providers
-  };
+  }
 }
 
 /**
@@ -79,16 +79,17 @@ export function receiveProviders(response) {
  */
 function requestAndReceiveProviders() {
   return dispatch => {
-    dispatch(requestProviders());
+    dispatch(requestProviders())
 
-    return api.getProviders()
-      .then(response => {
+    return api.getProviders().then(
+      response => {
         return dispatch(receiveProviders(response))
       },
       error => {
-        console.error(error.message);
-      });
-  };
+        console.error(error.message)
+      }
+    )
+  }
 }
 
 /**
@@ -98,7 +99,7 @@ function requestAndReceiveProviders() {
 export function updateProviders() {
   return (dispatch, getState) => {
     if (shouldRequestProviders(getState())) {
-      return dispatch(requestAndReceiveProviders());
+      return dispatch(requestAndReceiveProviders())
     }
-  };
+  }
 }
