@@ -15,7 +15,7 @@ class App extends React.Component {
       <div className="App">
         <Container maxWidth="lg">
           <Typography variant="h3" component="h1" gutterBottom>
-            Browse Everything
+            Browse Everything yo
           </Typography>
         </Container>
         <Container maxWidth="lg">
