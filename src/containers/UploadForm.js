@@ -101,11 +101,18 @@ class UploadForm extends React.Component {
               console.error(authResponse.error)
               this.clearSession()
             } else {
-              // This needs to be refactored
-              this.setState({ oauthToken: authResponse.access_token })
-              this.props.dispatch(
-                createClientAuthorization(this.state.oauthToken)
-              )
+              // This might actually be a Google API bug
+              const oauthToken = authResponse.access_token || result.uc.access_token
+              if (oauthToken) {
+                this.setState({ oauthToken })
+                this.props.dispatch(
+                  createClientAuthorization(this.state.oauthToken)
+                )
+              } else {
+                console.error('Failed to retrieve the OAuth2 token from the Google API response.')
+                console.error(authResponse)
+                this.clearSession()
+              }
             }
           }
         },

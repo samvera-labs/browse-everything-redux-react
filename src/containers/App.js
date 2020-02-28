@@ -56,10 +56,6 @@ App.propTypes = {
   onUpload: PropTypes.func
 }
 
-App.defaultProps = {
-  title: 'Browse Everything'
-}
-
 function mapStateToProps(state) {
   const { selectedProvider } = state
   const currentAuthToken = state.currentAuthToken || {
