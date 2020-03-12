@@ -1,16 +1,16 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Button from '@material-ui/core/Button'
-import { makeStyles } from '@material-ui/core/styles'
+import { withStyles } from '@material-ui/core/styles'
 
-const useStyles = makeStyles({
+const styles = {
   root: {
-    alignSelf: 'center'
+    alignSelf: 'center',
+    float: 'right'
   }
-})
+}
 
-const AuthButton = ({ handleClick, authorizationUrl, disabled }) => {
-  const classes = useStyles
+const AuthButton = ({ classes, handleClick, authorizationUrl, disabled }) => {
   const textContent = disabled ? 'Authorized' : 'Sign In'
 
   return (
@@ -29,9 +29,10 @@ const AuthButton = ({ handleClick, authorizationUrl, disabled }) => {
 }
 
 AuthButton.propTypes = {
+  classes: PropTypes.object.isRequired,
   handleClick: PropTypes.func.isRequired,
   authorizationUrl: PropTypes.string.isRequired,
   disabled: PropTypes.bool
 }
 
-export default AuthButton
+export default withStyles(styles)(AuthButton)

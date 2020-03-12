@@ -11,6 +11,7 @@ import { withStyles } from '@material-ui/core/styles'
 import SelectProvider from './SelectProvider'
 import AuthButton from './AuthButton'
 import ResourceTree from './ResourceTree'
+import GooglePickerTree from './GooglePickerTree'
 import {
   selectProvider,
   updateProviders,
@@ -19,6 +20,7 @@ import {
   clearSession,
   authorize,
   createAuthorization,
+  createClientAuthorization,
   createUpload
 } from '../actions'
 
@@ -28,7 +30,8 @@ class UploadForm extends React.Component {
     providerSupportsAuth: false,
     currentSessionEmpty: true,
     rootContainerEmpty: true,
-    currentUploadEmpty: true
+    currentUploadEmpty: true,
+    oauthToken: null
   }
 
   constructor(props) {
@@ -38,6 +41,33 @@ class UploadForm extends React.Component {
     this.handleAuthorize = this.handleAuthorize.bind(this)
     /** @todo Investigate why <form onSubmit> isn't being dispatched */
     this.handleClickSubmit = this.handleClickSubmit.bind(this)
+    this.requestGoogleAuth = this.requestGoogleAuth.bind(this)
+    this.clearSession = this.clearSession.bind(this)
+  }
+
+  clearSession() {
+    /**
+     * When there is an existing session and an upload has been created
+     */
+    if (this.props.currentUpload) {
+      const uploadEvent = new CustomEvent('browseEverything.upload', {
+        detail: this.props.currentUpload.item
+      })
+      window.dispatchEvent(uploadEvent)
+      if (this.props.onUpload) {
+        this.props.onUpload.call(this, uploadEvent)
+      }
+    }
+
+    // Reinitializing the state does not re-render the components
+    // This does not seem right, probably another point to refactor
+    this.setState({
+      providerSupportsAuth: false,
+      currentSessionEmpty: true,
+      rootContainerEmpty: true,
+      currentUploadEmpty: true
+    })
+    this.props.dispatch(clearSession())
   }
 
   /**
@@ -51,13 +81,60 @@ class UploadForm extends React.Component {
     this.props.dispatch(selectProvider(provider))
   }
 
+  requestGoogleAuth() {
+    const initialized = window.gapi.auth2.init({
+      client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID
+    })
+
+    initialized.then(googleAuth => {
+      let authenticated
+      authenticated = googleAuth.signIn({
+        scope: process.env.REACT_APP_GOOGLE_SCOPE
+      })
+
+      authenticated.then(
+        result => {
+          const authResponse = result.getAuthResponse()
+
+          if (authResponse) {
+            if (authResponse.error) {
+              console.error(authResponse.error)
+              this.clearSession()
+            } else {
+              // This might actually be a Google API bug
+              const oauthToken = authResponse.access_token || result.uc.access_token
+              if (oauthToken) {
+                this.setState({ oauthToken })
+                this.props.dispatch(
+                  createClientAuthorization(this.state.oauthToken)
+                )
+              } else {
+                console.error('Failed to retrieve the OAuth2 token from the Google API response.')
+                console.error(authResponse)
+                this.clearSession()
+              }
+            }
+          }
+        },
+        error => {
+          this.clearSession()
+        }
+      )
+    })
+  }
+
   /**
    * This initiates the OAuth2 workflow in another browser window or tab
    */
   handleClickAuthButton(event) {
-    // This opens the new window for the OAuth
     event.preventDefault()
-    window.open(this.props.selectedProvider.authorizationUrl)
+
+    if (this.googlePickerApi) {
+      this.requestGoogleAuth()
+    } else {
+      // This opens the new window for the OAuth
+      window.open(this.props.selectedProvider.authorizationUrl)
+    }
   }
 
   handleAuthorize(event) {
@@ -102,6 +179,10 @@ class UploadForm extends React.Component {
     if (providerSupportsAuth !== this.state.providerSupportsAuth) {
       this.setState({ providerSupportsAuth: providerSupportsAuth })
     }
+  }
+
+  get googlePickerApi() {
+    return this.props.selectedProvider.id === 'google_drive'
   }
 
   /**
@@ -154,7 +235,7 @@ class UploadForm extends React.Component {
        * If the session is established and there is no root container, request
        * it and build the resource tree
        */
-      if (!this.props.rootContainer.isRequesting) {
+      if (!this.props.rootContainer.isRequesting && !this.googlePickerApi) {
         this.props.dispatch(
           getRootContainer(
             this.props.currentSession.item,
@@ -178,7 +259,10 @@ class UploadForm extends React.Component {
           `Unsupported provider selected: ${this.props.selectedProvider.id}`
         )
       }
-      const providerSupportsAuth = !!requestedProvider.authorizationUrl
+
+      const providerSupportsAuth =
+        this.googlePickerApi || !!requestedProvider.authorizationUrl
+
       this.updateProviderSupportsAuth(providerSupportsAuth)
 
       if (this.props.currentAuthToken.authToken) {
@@ -202,18 +286,41 @@ class UploadForm extends React.Component {
 
   render() {
     let resourceTree
+    let renderResourceTree =
+      (!this.props.currentUpload.isRequesting &&
+        !this.state.rootContainerEmpty) ||
+      this.googlePickerApi
 
-    if (
-      !this.props.currentUpload.isRequesting &&
-      !this.state.rootContainerEmpty
-    ) {
-      resourceTree = (
-        <ResourceTree
-          root={true}
-          container={this.props.rootContainer.item}
-          dispatch={this.props.dispatch}
-        />
-      )
+    if (renderResourceTree) {
+      if (this.googlePickerApi) {
+        let innerText = 'Authorizing Google Drive...'
+        if (this.props.currentUpload.isRequesting) {
+          innerText = 'Uploading files...'
+        }
+
+        resourceTree = (
+          <GooglePickerTree
+            className={this.props.classes.resourceTree}
+            innerText={innerText}
+            dispatch={this.props.dispatch}
+            clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
+            developerKey={process.env.REACT_APP_GOOGLE_DEVELOPER_KEY}
+            oauthToken={this.state.oauthToken}
+            handleAuthApiLoad={this.requestGoogleAuth}
+            handleSubmit={this.handleClickSubmit}
+            handleCancel={this.clearSession}
+          />
+        )
+      } else {
+        resourceTree = (
+          <ResourceTree
+            className={this.props.classes.resourceTree}
+            root={true}
+            container={this.props.rootContainer.item}
+            dispatch={this.props.dispatch}
+          />
+        )
+      }
     } else {
       let rootContainerText = 'Please select a provider'
 
@@ -234,6 +341,18 @@ class UploadForm extends React.Component {
       )
     }
 
+    // Only checking providerSupportsAuth should be necessary
+    let renderAuthButton =
+      this.state.providerSupportsAuth &&
+      !!this.props.selectedProvider.authorizationUrl
+
+    let authButtonDisabled = true
+    if (this.googlePickerApi) {
+      authButtonDisabled = !!this.state.oauthToken || !window.gapi
+    } else {
+      authButtonDisabled = !!this.props.currentAuthToken.authToken
+    }
+
     return (
       <form className={this.props.classes.root} data-testid="upload-form">
         <Grid container spacing={3}>
@@ -246,11 +365,11 @@ class UploadForm extends React.Component {
           </Grid>
 
           <Grid item xs={6} className={this.props.classes.grid.item}>
-            {this.state.providerSupportsAuth && (
+            {renderAuthButton && (
               <AuthButton
                 handleClick={this.handleClickAuthButton}
                 authorizationUrl={this.props.selectedProvider.authorizationUrl}
-                disabled={!!this.props.currentAuthToken.authToken}
+                disabled={authButtonDisabled}
               />
             )}
           </Grid>
@@ -272,7 +391,6 @@ class UploadForm extends React.Component {
                 data-testid="upload-submit-button"
                 variant="contained"
                 color="primary"
-                className={this.props.classes.submit}
                 disabled={
                   this.state.currentUploadEmpty ||
                   this.props.currentUpload.isRequesting
@@ -312,10 +430,16 @@ const styles = {
   },
   resourceTreeContainer: {
     overflow: 'scroll',
-    maxHeight: '29.65rem'
+    maxHeight: '29.65rem',
+    borderStyle: 'solid',
+    borderWidth: '1px',
+    borderColor: '#cccccc',
+    marginTop: '0.7rem',
+    marginBottom: '0.7rem'
   },
   resourceTree: {
-    padding: '0.65rem 0.85rem'
+    padding: '0.65rem 0.85rem',
+    minHeight: '20rem'
   }
 }
 

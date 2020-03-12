@@ -129,7 +129,10 @@ const childStyles = {
 }
 
 const styles = {
-  root: {}
+  root: {
+    padding: '0.65rem 0.85rem',
+    minHeight: '20rem'
+  }
 }
 
 const StyledChildResourceTree = withStyles(childStyles)(ResourceTree)

@@ -6,6 +6,7 @@ import Container from '@material-ui/core/Container'
 import { connect } from 'react-redux'
 import Paper from '@material-ui/core/Paper'
 import { withStyles } from '@material-ui/core/styles'
+import { Trans } from 'react-i18next'
 
 class App extends React.Component {
   render() {
@@ -14,9 +15,11 @@ class App extends React.Component {
     return (
       <div className="App">
         <Container maxWidth="lg">
-          <Typography variant="h3" component="h1" gutterBottom>
-            Browse Everything
-          </Typography>
+          {this.props.title && (
+            <Typography variant="h3" component="h1" gutterBottom>
+              <Trans>{this.props.title}</Trans>
+            </Typography>
+          )}
         </Container>
         <Container maxWidth="lg">
           <Paper className={classes.root}>
@@ -41,6 +44,7 @@ class App extends React.Component {
 App.propTypes = {
   style: PropTypes.object,
   classes: PropTypes.object,
+  title: PropTypes.string,
   selectedProvider: PropTypes.object.isRequired, // This should be updated to currentProvider
   providers: PropTypes.object.isRequired,
   currentAuthToken: PropTypes.object.isRequired,
@@ -91,9 +95,9 @@ function mapStateToProps(state) {
 
 const styles = {
   root: {
-    padding: '30px'
+    padding: '30px',
+    paddingBottom: '2px'
   }
 }
 const AppWithStyles = withStyles(styles)(App)
-
 export default connect(mapStateToProps)(AppWithStyles)
