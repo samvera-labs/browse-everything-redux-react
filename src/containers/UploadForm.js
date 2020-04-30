@@ -94,7 +94,7 @@ class UploadForm extends React.Component {
 
       authenticated.then(
         result => {
-          const authResponse = result.getAuthResponse()
+          const authResponse = result.getAuthResponse(true)
 
           if (authResponse) {
             if (authResponse.error) {
