@@ -17,7 +17,8 @@
     "react-scripts": "3.1.1",
     "redux": "^4.0.4",
     "redux-bees": "^0.1.11",
-    "redux-thunk": "^2.3.0"
+    "redux-thunk": "^2.3.0",
+    "snyk": "^1.316.1"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -26,7 +27,9 @@
     "test:coverage": "react-scripts test --coverage --watchAll=false",
     "eject": "react-scripts eject",
     "lint": "eslint './src/**/*.{js,jsx}'",
-    "lint:fix": "eslint --fix './src/**/*.{js,jsx}'"
+    "lint:fix": "eslint --fix './src/**/*.{js,jsx}'",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -61,5 +64,6 @@
     "redux-logger": "^3.0.6",
     "redux-mock-store": "^1.5.3",
     "timekeeper": "^2.2.0"
-  }
+  },
+  "snyk": true
 }
