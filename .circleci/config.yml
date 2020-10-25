@@ -1,21 +1,22 @@
-version: 2 # use CircleCI 2.0
+version: 2.1
 jobs:
   build:
-    working_directory: ~/be-redux-react
+    working_directory: ~/browse-everything-redux-react
     docker:
       - image: circleci/node:12.14.0-browsers
 
     steps:
       - checkout
+
       # Restore the dependency cache
       - restore_cache:
-          keys: 
+          keys:
             - v1-dependencies-{{ checksum "package-lock.json" }}
             - v1-dependencies-
       - run:
           name: Install dependencies with NPM
           command: npm install
-    
+
       # Save the dependency cache
       - save_cache:
           key: v1-dependencies-{{ checksum "package-lock.json" }}
@@ -23,7 +24,7 @@ jobs:
             - node_modules
 
       # I kept this commented because it fails
-      # - run: 
+      # - run:
       #     name: Validate the style of the code
       #     command: yarn lint
 
@@ -34,7 +35,7 @@ jobs:
           path: coverage
 
 workflows:
-  version: 2
+  version: 2.1
   Build and Test:
     jobs:
       - build
