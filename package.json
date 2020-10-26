@@ -22,8 +22,8 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test --testPathIgnorePatterns=src/__tests__/testing-helpers.js  --env=jsdom",
-    "test:coverage": "react-scripts test --coverage --watchAll=false",
+    "test": "react-scripts test --testPathIgnorePatterns=src/__tests__/testing-helpers.js --env=jsdom",
+    "test:coverage": "react-scripts test --testPathIgnorePatterns=src/__tests__/testing-helpers.js --env=jsdom --coverage --watchAll=false",
     "eject": "react-scripts eject",
     "lint": "eslint './src/**/*.{js,jsx}'",
     "lint:fix": "eslint --fix './src/**/*.{js,jsx}'"
