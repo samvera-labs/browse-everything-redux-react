@@ -82,44 +82,30 @@ class UploadForm extends React.Component {
   }
 
   requestGoogleAuth() {
-    const initialized = window.gapi.auth2.init({
-      client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID
-    })
-
-    initialized.then(googleAuth => {
-      let authenticated
-      authenticated = googleAuth.signIn({
-        scope: process.env.REACT_APP_GOOGLE_SCOPE
-      })
-
-      authenticated.then(
-        result => {
-          const authResponse = result.getAuthResponse(true)
-
-          if (authResponse) {
-            if (authResponse.error) {
-              console.error(authResponse.error)
-              this.clearSession()
-            } else {
-              // This might actually be a Google API bug
-              const oauthToken = authResponse.access_token || result.uc.access_token
-              if (oauthToken) {
-                this.setState({ oauthToken })
-                this.props.dispatch(
-                  createClientAuthorization(this.state.oauthToken)
-                )
-              } else {
-                console.error('Failed to retrieve the OAuth2 token from the Google API response.')
-                console.error(authResponse)
-                this.clearSession()
-              }
-            }
-          }
-        },
-        error => {
+    window.gapi.auth2.authorize({
+      client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
+      scope: process.env.REACT_APP_GOOGLE_SCOPE,
+      response_type: 'id_token permission code'
+    }, (authResponse) =>  {
+      if (authResponse) {
+        if (authResponse.error) {
+          console.error(authResponse.error)
           this.clearSession()
+        } else {
+          // This might actually be a Google API bug
+          const oauthToken = authResponse.access_token || result.uc.access_token
+          if (oauthToken) {
+            this.setState({ oauthToken })
+            this.props.dispatch(
+              createClientAuthorization(this.state.oauthToken)
+            )
+          } else {
+            console.error('Failed to retrieve the OAuth2 token from the Google API response.')
+            console.error(authResponse)
+            this.clearSession()
+          }
         }
-      )
+      }
     })
   }
 
