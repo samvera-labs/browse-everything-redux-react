@@ -82,7 +82,7 @@ class UploadForm extends React.Component {
   }
 
   requestGoogleAuth() {
-    window.gapi2.auth2.authorize({
+    window.gapi.auth2.authorize({
       client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
       scope: process.env.REACT_APP_GOOGLE_SCOPE,
       response_type: 'id_token permission code'
